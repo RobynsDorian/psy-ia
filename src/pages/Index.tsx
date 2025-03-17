@@ -1,8 +1,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useForm } from "react-hook-form";
-import { Plus, Edit, Trash2, Users, FileText } from "lucide-react";
+import { Plus, Calendar, ArrowUp, ArrowDown, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -13,7 +12,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -27,18 +25,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { PatientForm } from "@/components/patients/PatientForm";
-import { Patient, PatientListItem } from "@/types/patient";
+import { Patient } from "@/types/patient";
 
-// Données d'exemple pour les patients
+// Exemple patient data
 const initialPatients: Patient[] = [
   {
     id: "1",
@@ -78,16 +68,16 @@ const Index = () => {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentPatient, setCurrentPatient] = useState<Patient | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<"code" | "createdAt" | "updatedAt">("code");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  // Fonction pour générer un code patient aléatoire à 6 chiffres
+  // Generate random patient code
   const generatePatientCode = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  // Gérer l'ajout d'un nouveau patient
+  // Handle adding a new patient
   const handleAddPatient = (data: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newPatient: Patient = {
       id: Date.now().toString(),
@@ -101,39 +91,46 @@ const Index = () => {
     toast.success("Patient ajouté avec succès");
   };
 
-  // Gérer la modification d'un patient
-  const handleEditPatient = (data: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!currentPatient) return;
-    
-    const updatedPatients = patients.map(patient => 
-      patient.id === currentPatient.id 
-        ? { ...patient, ...data, updatedAt: new Date() } 
-        : patient
-    );
-    
-    setPatients(updatedPatients);
-    setIsEditDialogOpen(false);
-    setCurrentPatient(null);
-    toast.success("Patient modifié avec succès");
+  // Handle sorting
+  const handleSort = (field: "code" | "createdAt" | "updatedAt") => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
   };
 
-  // Gérer la suppression d'un patient
-  const handleDeletePatient = (id: string) => {
-    setPatients(patients.filter(patient => patient.id !== id));
-    toast.success("Patient supprimé avec succès");
-  };
-
-  // Ouvrir le dossier d'un patient
+  // Open patient file
   const handleOpenPatientFile = (id: string) => {
     navigate(`/patient/${id}`);
   };
 
-  // Filtrer les patients en fonction du terme de recherche
+  // Filter patients by search term
   const filteredPatients = patients.filter(patient => 
-    patient.code.includes(searchTerm) || 
-    patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+    patient.code.includes(searchTerm)
   );
+
+  // Sort patients
+  const sortedPatients = [...filteredPatients].sort((a, b) => {
+    if (sortField === "code") {
+      return sortDirection === "asc" 
+        ? a.code.localeCompare(b.code) 
+        : b.code.localeCompare(a.code);
+    } else {
+      const dateA = sortField === "createdAt" ? a.createdAt : a.updatedAt;
+      const dateB = sortField === "createdAt" ? b.createdAt : b.updatedAt;
+      return sortDirection === "asc" 
+        ? dateA.getTime() - dateB.getTime() 
+        : dateB.getTime() - dateA.getTime();
+    }
+  });
+
+  // Render sort icon
+  const renderSortIcon = (field: "code" | "createdAt" | "updatedAt") => {
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -190,7 +187,7 @@ const Index = () => {
               </CardTitle>
               <div className="w-64">
                 <Input
-                  placeholder="Rechercher un patient..."
+                  placeholder="Rechercher un code patient..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
@@ -201,95 +198,57 @@ const Index = () => {
           <CardContent>
             <Table>
               <TableCaption>
-                {filteredPatients.length === 0 
+                {sortedPatients.length === 0 
                   ? "Aucun patient trouvé" 
-                  : `Liste des patients (${filteredPatients.length})`}
+                  : `Liste des patients (${sortedPatients.length})`}
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Code</TableHead>
-                  <TableHead className="w-[80px]">Âge</TableHead>
-                  <TableHead className="w-[80px]">Genre</TableHead>
-                  <TableHead className="w-[150px]">Date d'ajout</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead 
+                    className="w-[100px] cursor-pointer" 
+                    onClick={() => handleSort("code")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Code {renderSortIcon("code")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="w-[150px] cursor-pointer"
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} className="mr-1" />
+                      Date d'ajout {renderSortIcon("createdAt")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="w-[150px] cursor-pointer"
+                    onClick={() => handleSort("updatedAt")}
+                  >
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} className="mr-1" />
+                      Dernière MAJ {renderSortIcon("updatedAt")}
+                    </div>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPatients.length === 0 ? (
+                {sortedPatients.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
                       Aucun patient ne correspond à votre recherche
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredPatients.map((patient) => (
+                  sortedPatients.map((patient) => (
                     <TableRow 
                       key={patient.id} 
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleOpenPatientFile(patient.id)}
                     >
                       <TableCell className="font-medium">{patient.code}</TableCell>
-                      <TableCell>{patient.age}</TableCell>
-                      <TableCell>{patient.gender}</TableCell>
                       <TableCell>{patient.createdAt.toLocaleDateString()}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Dialog open={isEditDialogOpen && currentPatient?.id === patient.id} onOpenChange={(open) => {
-                            setIsEditDialogOpen(open);
-                            if (!open) setCurrentPatient(null);
-                          }}>
-                            <DialogTrigger asChild>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setCurrentPatient(patient);
-                                  setIsEditDialogOpen(true);
-                                }}
-                              >
-                                <Edit size={14} />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Modifier le Patient</DialogTitle>
-                                <DialogDescription>
-                                  Modifiez les informations du patient
-                                </DialogDescription>
-                              </DialogHeader>
-                              {currentPatient && (
-                                <PatientForm 
-                                  onSubmit={handleEditPatient}
-                                  initialData={{
-                                    code: currentPatient.code,
-                                    firstName: currentPatient.firstName,
-                                    lastName: currentPatient.lastName,
-                                    age: currentPatient.age,
-                                    gender: currentPatient.gender,
-                                    notes: currentPatient.notes || ""
-                                  }}
-                                  onCancel={() => {
-                                    setIsEditDialogOpen(false);
-                                    setCurrentPatient(null);
-                                  }}
-                                />
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                          
-                          <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeletePatient(patient.id);
-                            }}
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      <TableCell>{patient.updatedAt.toLocaleDateString()}</TableCell>
                     </TableRow>
                   ))
                 )}

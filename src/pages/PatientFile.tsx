@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Edit, Calendar, ClipboardList, FileText, Wand2 } from "lucide-react";
+import { ArrowLeft, Edit, Calendar, ClipboardList, FileText, Wand2, Heart, Home, GraduationCap } from "lucide-react";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AudioRecorder from "@/components/audio/AudioRecorder";
 import TranscriptionEditor from "@/components/transcription/TranscriptionEditor";
-import { Patient } from "@/types/patient";
+import { Patient, BackgroundSection, GeneratedBackground } from "@/types/patient";
 
 // Données d'exemple pour les patients (à remplacer par une vraie source de données)
 const initialPatients: Patient[] = [
@@ -56,6 +56,8 @@ const PatientFile = () => {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [transcription, setTranscription] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isGeneratingBackground, setIsGeneratingBackground] = useState(false);
+  const [generatedBackground, setGeneratedBackground] = useState<GeneratedBackground | null>(null);
   
   useEffect(() => {
     // Récupérer les données du patient
@@ -121,6 +123,45 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
     localStorage.setItem("patientCode", patient?.code || "");
     // Redirigez vers la page d'analyse avec l'ID du patient
     navigate(`/patient/${id}/analysis`);
+  };
+
+  const generatePatientBackground = () => {
+    if (!patient) return;
+    
+    setIsGeneratingBackground(true);
+    
+    // Simulate AI generation with timeout
+    setTimeout(() => {
+      const sampleBackground: GeneratedBackground = {
+        summary: `${patient.firstName} ${patient.lastName} a grandi dans un foyer où les attentes parentales étaient élevées, particulièrement de la part de sa mère. Cette dynamique familiale a créé un sentiment constant de pression et d'insuffisance. La relation avec son père, bien que moins conflictuelle, est marquée par une certaine passivité. ${patient.firstName} a également une sœur nommée Julie qui semble bénéficier d'un traitement préférentiel de la part de la mère, ce qui a généré des sentiments de jalousie et d'injustice. Le grand-père paternel a joué un rôle de soutien émotionnel important, mais son décès récent a laissé un vide significatif.`,
+        sections: [
+          {
+            title: "Enfance",
+            content: `${patient.firstName} a grandi dans un environnement familial exigeant où les attentes parentales, surtout maternelles, étaient très élevées. Cette période a façonné sa perception de soi et son estime personnelle.`,
+            icon: "home"
+          },
+          {
+            title: "Relations familiales",
+            content: `Relations tendues avec sa mère, plus distantes mais moins conflictuelles avec son père. Rivalité avec sa sœur Julie qui semble être la "préférée". Le grand-père paternel était une figure de soutien importante.`,
+            icon: "heart"
+          },
+          {
+            title: "Événements marquants",
+            content: `Le décès du grand-père paternel l'année dernière a été particulièrement difficile, privant ${patient.firstName} d'une source importante de validation et de soutien émotionnel.`,
+            icon: "calendar"
+          },
+          {
+            title: "Parcours personnel",
+            content: `${patient.firstName} semble lutter pour trouver sa place et obtenir une reconnaissance, particulièrement au sein de sa famille. Ces difficultés relationnelles pourraient avoir un impact sur d'autres aspects de sa vie comme ses relations sociales ou professionnelles.`,
+            icon: "graduation"
+          }
+        ]
+      };
+      
+      setGeneratedBackground(sampleBackground);
+      setIsGeneratingBackground(false);
+      toast.success("Historique généré avec succès");
+    }, 3000);
   };
   
   const formatDate = (date: Date) => {
@@ -274,6 +315,76 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-wrap">{patient.notes || "Aucune note pour ce patient."}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Historique du patient</CardTitle>
+                    <CardDescription>
+                      Génération IA d'une histoire personnalisée basée sur les données du patient
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={generatePatientBackground}
+                    disabled={isGeneratingBackground}
+                    className="flex items-center gap-2"
+                  >
+                    {isGeneratingBackground ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                        Génération...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 size={16} />
+                        Générer un historique
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {generatedBackground ? (
+                  <div className="space-y-6">
+                    <div className="p-4 border rounded-lg bg-muted/30">
+                      <h3 className="font-medium mb-2">Résumé</h3>
+                      <p className="text-sm">{generatedBackground.summary}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {generatedBackground.sections.map((section, index) => {
+                        let Icon;
+                        switch (section.icon) {
+                          case "calendar": Icon = Calendar; break;
+                          case "heart": Icon = Heart; break;
+                          case "home": Icon = Home; break;
+                          case "graduation": Icon = GraduationCap; break;
+                          default: Icon = Calendar;
+                        }
+                        
+                        return (
+                          <div key={index} className="border rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="rounded-full bg-primary/10 p-2 text-primary">
+                                <Icon size={16} />
+                              </div>
+                              <h3 className="font-medium">{section.title}</h3>
+                            </div>
+                            <p className="text-sm">{section.content}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>Aucun historique n'a encore été généré.</p>
+                    <p className="text-sm mt-2">Cliquez sur "Générer un historique" pour créer un résumé IA du parcours du patient.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
