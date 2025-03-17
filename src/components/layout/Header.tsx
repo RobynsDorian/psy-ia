@@ -18,7 +18,7 @@ const Header = () => {
     >
       <div className="flex items-center space-x-2">
         <motion.div 
-          className="h-10 w-10 bg-primary/90 backdrop-blur rounded-xl flex items-center justify-center text-white"
+          className="h-10 w-10 bg-sonalis-primary rounded-xl flex items-center justify-center text-white"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -32,7 +32,7 @@ const Header = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          TherapyMapper
+          SONALIS
         </motion.h1>
       </div>
       
@@ -42,7 +42,7 @@ const Header = () => {
           onClick={() => navigate("/")}
           className="px-4 rounded-xl transition-all duration-300"
         >
-          Accueil
+          Patients
         </Button>
         <Button
           variant={isActive("/transcription") ? "default" : "ghost"} 
