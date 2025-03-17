@@ -25,4 +25,23 @@ export interface BackgroundSection {
 export interface GeneratedBackground {
   summary: string;
   sections: BackgroundSection[];
+  id?: string;
+  createdAt?: Date;
+  title?: string;
+}
+
+export interface PatientSession {
+  id: string;
+  patientId: string;
+  date: Date;
+  transcription: string;
+  analysis?: string;
+}
+
+export interface PatientRelationship {
+  id: string;
+  name: string;
+  relation: string;
+  description: string;
+  connections: string[];
 }
