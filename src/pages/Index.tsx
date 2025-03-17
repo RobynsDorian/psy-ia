@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { Plus, Edit, Trash2, Users } from "lucide-react";
+import { Plus, Edit, Trash2, Users, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -35,7 +36,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { PatientForm } from "@/components/patients/PatientForm";
-import { Patient } from "@/types/patient";
+import { Patient, PatientListItem } from "@/types/patient";
 
 // Données d'exemple pour les patients
 const initialPatients: Patient[] = [
@@ -74,6 +75,7 @@ const initialPatients: Patient[] = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -119,6 +121,11 @@ const Index = () => {
   const handleDeletePatient = (id: string) => {
     setPatients(patients.filter(patient => patient.id !== id));
     toast.success("Patient supprimé avec succès");
+  };
+
+  // Ouvrir le dossier d'un patient
+  const handleOpenPatientFile = (id: string) => {
+    navigate(`/patient/${id}`);
   };
 
   // Filtrer les patients en fonction du terme de recherche
@@ -201,8 +208,6 @@ const Index = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">Code</TableHead>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Prénom</TableHead>
                   <TableHead className="w-[80px]">Âge</TableHead>
                   <TableHead className="w-[80px]">Genre</TableHead>
                   <TableHead className="w-[150px]">Date d'ajout</TableHead>
@@ -212,16 +217,18 @@ const Index = () => {
               <TableBody>
                 {filteredPatients.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       Aucun patient ne correspond à votre recherche
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredPatients.map((patient) => (
-                    <TableRow key={patient.id}>
+                    <TableRow 
+                      key={patient.id} 
+                      className="cursor-pointer"
+                      onClick={() => handleOpenPatientFile(patient.id)}
+                    >
                       <TableCell className="font-medium">{patient.code}</TableCell>
-                      <TableCell>{patient.lastName}</TableCell>
-                      <TableCell>{patient.firstName}</TableCell>
                       <TableCell>{patient.age}</TableCell>
                       <TableCell>{patient.gender}</TableCell>
                       <TableCell>{patient.createdAt.toLocaleDateString()}</TableCell>
@@ -235,7 +242,8 @@ const Index = () => {
                               <Button 
                                 variant="outline" 
                                 size="sm"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setCurrentPatient(patient);
                                   setIsEditDialogOpen(true);
                                 }}
@@ -273,7 +281,10 @@ const Index = () => {
                           <Button 
                             variant="destructive" 
                             size="sm"
-                            onClick={() => handleDeletePatient(patient.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeletePatient(patient.id);
+                            }}
                           >
                             <Trash2 size={14} />
                           </Button>

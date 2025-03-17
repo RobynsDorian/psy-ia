@@ -12,3 +12,6 @@ export interface Patient {
 }
 
 export type PatientFormData = Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>;
+
+// Type pour l'affichage dans la liste (sans données confidentielles)
+export type PatientListItem = Pick<Patient, 'id' | 'code' | 'age' | 'gender' | 'createdAt'>;
