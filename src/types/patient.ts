@@ -45,3 +45,27 @@ export interface PatientRelationship {
   description: string;
   connections: string[];
 }
+
+export interface StoryTemplate {
+  id: string;
+  title: string;
+  type: 'children' | 'adult' | 'therapeutic';
+  description: string;
+}
+
+export interface GeneratedStory {
+  id: string;
+  patientId: string;
+  title: string;
+  content: string;
+  type: 'children' | 'adult' | 'therapeutic';
+  createdAt: Date;
+  baseTemplate?: StoryTemplate;
+  pages: string[];
+}
+
+export interface StoryFormData {
+  title: string;
+  type: 'children' | 'adult' | 'therapeutic';
+  additionalContext?: string;
+}

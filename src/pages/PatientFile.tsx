@@ -1,20 +1,18 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Edit, Calendar, ClipboardList, FileText, Wand2, Heart, Home, GraduationCap, Users } from "lucide-react";
+import { ArrowLeft, ClipboardList, Calendar, FileText, Users } from "lucide-react";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Patient, BackgroundSection, GeneratedBackground, PatientSession, PatientRelationship } from "@/types/patient";
+import { Patient, BackgroundSection, GeneratedBackground, PatientSession, PatientRelationship, GeneratedStory } from "@/types/patient";
 import InformationTab from "@/components/patient/InformationTab";
 import SessionsTab from "@/components/patient/SessionsTab";
 import RelationsTab from "@/components/patient/RelationsTab";
 import HistoryTab from "@/components/patient/HistoryTab";
 
-// Données d'exemple pour les patients (à remplacer par une vraie source de données)
 const initialPatients: Patient[] = [
   {
     id: "1",
@@ -50,7 +48,6 @@ const initialPatients: Patient[] = [
   },
 ];
 
-// Données d'exemple pour les sessions
 const initialSessions: PatientSession[] = [
   {
     id: "1",
@@ -67,7 +64,6 @@ const initialSessions: PatientSession[] = [
   }
 ];
 
-// Données d'exemple pour les relations
 const initialRelationships: PatientRelationship[] = [
   {
     id: "1",
@@ -92,7 +88,6 @@ const initialRelationships: PatientRelationship[] = [
   }
 ];
 
-// Données d'exemple pour les historiques
 const initialHistories: GeneratedBackground[] = [
   {
     id: "1",
@@ -124,20 +119,18 @@ const PatientFile = () => {
   const [sessions, setSessions] = useState<PatientSession[]>([]);
   const [relationships, setRelationships] = useState<PatientRelationship[]>([]);
   const [histories, setHistories] = useState<GeneratedBackground[]>([]);
+  const [stories, setStories] = useState<GeneratedStory[]>([]);
   
   useEffect(() => {
-    // Récupérer les données du patient
     if (id) {
       const foundPatient = initialPatients.find(p => p.id === id);
       
       if (foundPatient) {
         setPatient(foundPatient);
         
-        // Filtrer les sessions pour ce patient
         const patientSessions = initialSessions.filter(s => s.patientId === id);
         setSessions(patientSessions);
         
-        // Charger les relations (simulé - normalement serait basé sur le patient)
         if (id === "1") {
           setRelationships(initialRelationships);
           setHistories(initialHistories);
@@ -146,7 +139,6 @@ const PatientFile = () => {
           setHistories([]);
         }
         
-        // Charger le dernier historique généré
         if (initialHistories.length > 0 && id === "1") {
           setGeneratedBackground(initialHistories[0]);
         } else {
@@ -169,7 +161,6 @@ const PatientFile = () => {
     
     setIsGeneratingBackground(true);
     
-    // Simulate AI generation with timeout
     setTimeout(() => {
       const sampleBackground: GeneratedBackground = {
         id: Date.now().toString(),
