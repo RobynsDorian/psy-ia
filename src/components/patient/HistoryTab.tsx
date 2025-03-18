@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +35,6 @@ const storyFormSchema = z.object({
   additionalContext: z.string().optional(),
 });
 
-// Données d'exemple pour les histoires
 const sampleStories: GeneratedStory[] = [
   {
     id: "1",
@@ -133,7 +131,13 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
   };
   
   const onStoryFormSubmit = (data: z.infer<typeof storyFormSchema>) => {
-    generateStory(data);
+    const storyData: StoryFormData = {
+      title: data.title,
+      type: data.type,
+      additionalContext: data.additionalContext
+    };
+    
+    generateStory(storyData);
   };
   
   return (
