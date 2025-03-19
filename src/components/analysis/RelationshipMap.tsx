@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { motion } from "framer-motion";
 import { UserRound, Heart, Users, FileDown, FileText, History, RotateCcw, Pen, Save } from "lucide-react";
 import { PatientRelationship, GenogramVersion } from "@/types/patient";
 
-// Exemple de versions du génogramme
+// Sample genogram versions
 const sampleGenogramVersions: GenogramVersion[] = [
   {
     id: "1",
@@ -37,16 +36,17 @@ const sampleGenogramVersions: GenogramVersion[] = [
 interface RelationshipMapProps {
   relationships: PatientRelationship[];
   patientId: string;
+  onExport?: () => void; // Added onExport prop as optional
 }
 
-const RelationshipMap = ({ relationships, patientId }: RelationshipMapProps) => {
+const RelationshipMap = ({ relationships, patientId, onExport }: RelationshipMapProps) => {
   const [activeTab, setActiveTab] = useState("list");
   const [genogramVersions, setGenogramVersions] = useState(sampleGenogramVersions);
   const [currentVersion, setCurrentVersion] = useState(genogramVersions[genogramVersions.length - 1]);
   const [isEditing, setIsEditing] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   
-  // Simuler l'exportation et la création d'une nouvelle version
+  // Simulate exporting and creating a new version
   const handleExportPDF = () => {
     if (isEditing) {
       const newVersion: GenogramVersion = {
@@ -62,11 +62,16 @@ const RelationshipMap = ({ relationships, patientId }: RelationshipMapProps) => 
       setIsEditing(false);
       toast.success("Génogramme enregistré avec succès");
     } else {
-      toast.success("Génogramme exporté au format PDF");
+      // Use the onExport prop if provided, otherwise show a toast
+      if (onExport) {
+        onExport();
+      } else {
+        toast.success("Génogramme exporté au format PDF");
+      }
     }
   };
   
-  // Restaurer une version précédente
+  // Restore a previous version
   const handleRestoreVersion = (version: GenogramVersion) => {
     setCurrentVersion(version);
     setShowVersionHistory(false);
