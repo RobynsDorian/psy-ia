@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -22,8 +21,8 @@ import { Appointment } from "@/types/patient";
 import { Calendar as CalendarIcon, Plus, Clock, Search, Edit, Check, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
+import WeekView from "@/components/appointments/WeekView";
 
-// Données d'exemple pour les rendez-vous
 const sampleAppointments: Appointment[] = [
   {
     id: "1",
@@ -74,7 +73,6 @@ const Appointments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("list");
   
-  // Filtrer les rendez-vous par date et terme de recherche
   const filteredAppointments = appointments.filter(appointment => {
     const matchesSearch = !searchTerm || 
       appointment.patientCode.includes(searchTerm);
@@ -90,10 +88,8 @@ const Appointments = () => {
     return matchesSearch;
   });
   
-  // Trier les rendez-vous par date
   const sortedAppointments = [...filteredAppointments].sort((a, b) => a.date.getTime() - b.date.getTime());
   
-  // Format de date pour les rendez-vous
   const formatAppointmentDate = (date: Date) => {
     const isToday = new Date().toDateString() === date.toDateString();
     
@@ -110,7 +106,6 @@ const Appointments = () => {
     return format(date, "EEEE d MMMM à HH:mm", { locale: fr });
   };
   
-  // Gérer l'ajout d'un nouveau rendez-vous
   const handleAddAppointment = (data: Omit<Appointment, 'id'>) => {
     const newAppointment: Appointment = {
       id: Date.now().toString(),
@@ -122,12 +117,10 @@ const Appointments = () => {
     toast.success("Rendez-vous ajouté avec succès");
   };
   
-  // Voir le dossier patient
   const handleViewPatient = (patientId: string) => {
     navigate(`/patient/${patientId}`);
   };
   
-  // Clôturer un rendez-vous
   const handleCloseAppointment = (appointmentId: string) => {
     setAppointments(prev => 
       prev.map(app => 
@@ -139,7 +132,6 @@ const Appointments = () => {
     toast.success("Rendez-vous clôturé avec succès");
   };
   
-  // Jours du calendrier où il y a des rendez-vous
   const appointmentDates = appointments.map(app => {
     const date = new Date(app.date);
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -188,6 +180,7 @@ const Appointments = () => {
             <TabsList>
               <TabsTrigger value="list">Liste</TabsTrigger>
               <TabsTrigger value="calendar">Calendrier</TabsTrigger>
+              <TabsTrigger value="week">Semaine</TabsTrigger>
             </TabsList>
             
             <div className="flex items-center space-x-4">
@@ -375,6 +368,13 @@ const Appointments = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="week" className="mt-0">
+            <WeekView 
+              appointments={appointments} 
+              onCloseAppointment={handleCloseAppointment} 
+            />
           </TabsContent>
         </Tabs>
       </motion.main>
