@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Patients from "./pages/Patients";
 import Appointments from "./pages/Appointments";
 import PatientFile from "./pages/PatientFile";
-import PatientAnalysis from "./pages/PatientAnalysis";
+import { PatientAnalysis } from "./pages/PatientAnalysis"; // Changed from default to named import
 import NotFound from "./pages/NotFound";
 import { MainSidebarWrapper } from "./components/layout/MainSidebar";
 
