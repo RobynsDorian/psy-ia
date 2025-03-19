@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -313,9 +314,6 @@ const PatientFile = () => {
             <InformationTab
               patient={patient}
               onUpdatePatient={handleUpdatePatient}
-              generatedBackground={generatedBackground}
-              isGeneratingBackground={isGeneratingBackground}
-              generatePatientBackground={generatePatientBackground}
             />
           </TabsContent>
           

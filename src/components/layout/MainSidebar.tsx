@@ -9,8 +9,7 @@ import {
   SidebarProvider,
   SidebarHeader,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel
+  SidebarGroup
 } from "@/components/ui/sidebar";
 import { motion } from "framer-motion";
 import { LayoutDashboard, Users, Calendar } from "lucide-react";
@@ -71,7 +70,6 @@ const MainSidebar = () => {
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarMenu>
             {menuItems.map((item, index) => (
               <SidebarMenuItem key={item.path}>

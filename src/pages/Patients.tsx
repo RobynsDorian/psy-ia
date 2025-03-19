@@ -108,9 +108,7 @@ const Patients = () => {
 
   // Filter patients by search term
   const filteredPatients = patients.filter(patient => 
-    patient.code.includes(searchTerm) ||
-    patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+    patient.code.includes(searchTerm)
   );
 
   // Sort patients
@@ -189,7 +187,7 @@ const Patients = () => {
               </CardTitle>
               <div className="w-64">
                 <Input
-                  placeholder="Rechercher un patient..."
+                  placeholder="Rechercher par code..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
@@ -214,9 +212,6 @@ const Patients = () => {
                       Code {renderSortIcon("code")}
                     </div>
                   </TableHead>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Prénom</TableHead>
-                  <TableHead>Âge</TableHead>
                   <TableHead 
                     className="w-[150px] cursor-pointer"
                     onClick={() => handleSort("createdAt")}
@@ -235,12 +230,13 @@ const Patients = () => {
                       Dernière MAJ {renderSortIcon("updatedAt")}
                     </div>
                   </TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedPatients.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                       Aucun patient ne correspond à votre recherche
                     </TableCell>
                   </TableRow>
@@ -249,14 +245,18 @@ const Patients = () => {
                     <TableRow 
                       key={patient.id} 
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleOpenPatientFile(patient.id)}
                     >
                       <TableCell className="font-medium">{patient.code}</TableCell>
-                      <TableCell>{patient.lastName}</TableCell>
-                      <TableCell>{patient.firstName}</TableCell>
-                      <TableCell>{patient.age} ans</TableCell>
                       <TableCell>{patient.createdAt.toLocaleDateString()}</TableCell>
                       <TableCell>{patient.updatedAt.toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          onClick={() => handleOpenPatientFile(patient.id)}
+                          size="sm"
+                        >
+                          Voir le dossier
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

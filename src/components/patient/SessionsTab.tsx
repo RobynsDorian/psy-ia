@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PatientSession, Appointment } from "@/types/patient";
-import { FileText, Calendar, Plus, Wand2, Filter, Clock, FastForward, PlayCircle } from "lucide-react";
+import { FileText, Calendar, Plus, Wand2, Filter, Clock, FastForward, PlayCircle, Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AudioRecorder from "@/components/audio/AudioRecorder";
 import TranscriptionEditor from "@/components/transcription/TranscriptionEditor";
@@ -118,6 +118,18 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
     setFutureAppointments([...futureAppointments, newAppointment]);
     setIsAddAppointmentOpen(false);
     toast.success("Rendez-vous ajouté avec succès");
+  };
+  
+  // Clôturer un rendez-vous
+  const handleCloseAppointment = (appointmentId: string) => {
+    setFutureAppointments(prev => 
+      prev.map(app => 
+        app.id === appointmentId 
+          ? { ...app, status: "completed" } 
+          : app
+      )
+    );
+    toast.success("Rendez-vous clôturé avec succès");
   };
   
   // Combinaison des séances passées et des rendez-vous futurs pour l'affichage
@@ -287,6 +299,14 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
                               >
                                 <Calendar className="h-4 w-4 mr-1" />
                                 Modifier
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleCloseAppointment(item.id)}
+                              >
+                                <Check className="h-4 w-4 mr-1" />
+                                Clôturer
                               </Button>
                               <Button 
                                 size="sm"

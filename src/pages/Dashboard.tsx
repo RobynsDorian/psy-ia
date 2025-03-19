@@ -41,7 +41,7 @@ const upcomingAppointments: Appointment[] = [
   {
     id: "1",
     patientId: "1",
-    patientName: "Jean Dupont",
+    patientName: "Patient #426247",
     patientCode: "426247",
     date: new Date(new Date().setHours(new Date().getHours() + 3)),
     duration: 45,
@@ -51,7 +51,7 @@ const upcomingAppointments: Appointment[] = [
   {
     id: "2",
     patientId: "2",
-    patientName: "Marie Laurent",
+    patientName: "Patient #782523",
     patientCode: "782523",
     date: new Date(new Date().setDate(new Date().getDate() + 1)),
     duration: 60,
@@ -61,7 +61,7 @@ const upcomingAppointments: Appointment[] = [
   {
     id: "3",
     patientId: "3",
-    patientName: "Thomas Martin",
+    patientName: "Patient #934721",
     patientCode: "934721",
     date: new Date(new Date().setDate(new Date().getDate() + 2)),
     duration: 30,
@@ -89,7 +89,7 @@ const Dashboard = () => {
     return format(date, "EEEE d MMMM à HH:mm", { locale: fr });
   };
   
-  const handleStartSession = (appointmentId: string, patientId: string) => {
+  const handleViewPatient = (patientId: string) => {
     navigate(`/patient/${patientId}`);
   };
   
@@ -142,8 +142,8 @@ const Dashboard = () => {
                         <div className="flex items-start justify-between">
                           <div>
                             <div className="flex items-center space-x-2">
-                              <div className="font-medium">{appointment.patientName}</div>
-                              <div className="text-xs bg-muted px-2 py-0.5 rounded">{appointment.patientCode}</div>
+                              <div className="font-medium">{appointment.patientCode}</div>
+                              <div className="text-xs bg-muted px-2 py-0.5 rounded">Patient</div>
                             </div>
                             <div className="flex items-center mt-1 text-sm text-muted-foreground">
                               <Clock className="h-3.5 w-3.5 mr-1.5" />
@@ -165,9 +165,9 @@ const Dashboard = () => {
                             </Button>
                             <Button 
                               size="sm"
-                              onClick={() => handleStartSession(appointment.id, appointment.patientId)}
+                              onClick={() => handleViewPatient(appointment.patientId)}
                             >
-                              Débuter
+                              Voir le dossier
                             </Button>
                           </div>
                         </div>
@@ -189,29 +189,6 @@ const Dashboard = () => {
                 )}
               </CardContent>
             </Card>
-            
-            {/* Statistiques ou autres informations (à implémenter) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Sessions cette semaine</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">5</div>
-                  <p className="text-xs text-muted-foreground mt-1">+2 par rapport à la semaine précédente</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Nouveaux patients ce mois</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">3</div>
-                  <p className="text-xs text-muted-foreground mt-1">-1 par rapport au mois précédent</p>
-                </CardContent>
-              </Card>
-            </div>
           </div>
           
           {/* Colonne de droite - 4/12 */}
@@ -244,12 +221,10 @@ const Dashboard = () => {
                       onClick={() => navigate(`/patient/${patient.id}`)}
                     >
                       <div className="font-medium">
-                        {patient.firstName} {patient.lastName}
+                        Patient #{patient.code}
                       </div>
                       <div className="flex items-center mt-1 text-sm text-muted-foreground">
-                        <span>Code: {patient.code}</span>
-                        <span className="mx-1.5">•</span>
-                        <span>{patient.age} ans</span>
+                        <span>Dernière mise à jour: {format(patient.updatedAt, 'dd/MM/yyyy')}</span>
                       </div>
                     </div>
                   ))}
@@ -257,7 +232,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            {/* Calendrier compact ou autres éléments */}
+            {/* Actions rapides */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Actions rapides</CardTitle>
@@ -274,10 +249,10 @@ const Dashboard = () => {
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => navigate('/appointments/new')}
+                  onClick={() => navigate('/appointments')}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
-                  Nouveau rendez-vous
+                  Gérer les rendez-vous
                 </Button>
               </CardContent>
             </Card>

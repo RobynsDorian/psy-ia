@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Appointment } from "@/types/patient";
-import { Calendar as CalendarIcon, Plus, Clock, Search, Edit, Play } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Clock, Search, Edit, Check, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
 
@@ -28,7 +28,7 @@ const sampleAppointments: Appointment[] = [
   {
     id: "1",
     patientId: "1",
-    patientName: "Jean Dupont",
+    patientName: "Patient #426247",
     patientCode: "426247",
     date: new Date(new Date().setHours(new Date().getHours() + 3)),
     duration: 45,
@@ -38,7 +38,7 @@ const sampleAppointments: Appointment[] = [
   {
     id: "2",
     patientId: "2",
-    patientName: "Marie Laurent",
+    patientName: "Patient #782523",
     patientCode: "782523",
     date: new Date(new Date().setDate(new Date().getDate() + 1)),
     duration: 60,
@@ -48,7 +48,7 @@ const sampleAppointments: Appointment[] = [
   {
     id: "3",
     patientId: "3",
-    patientName: "Thomas Martin",
+    patientName: "Patient #934721",
     patientCode: "934721",
     date: new Date(new Date().setDate(new Date().getDate() + 2)),
     duration: 30,
@@ -57,7 +57,7 @@ const sampleAppointments: Appointment[] = [
   {
     id: "4",
     patientId: "1",
-    patientName: "Jean Dupont",
+    patientName: "Patient #426247",
     patientCode: "426247",
     date: new Date(new Date().setDate(new Date().getDate() + 7)),
     duration: 45,
@@ -77,8 +77,7 @@ const Appointments = () => {
   // Filtrer les rendez-vous par date et terme de recherche
   const filteredAppointments = appointments.filter(appointment => {
     const matchesSearch = !searchTerm || 
-      (appointment.patientName && appointment.patientName.toLowerCase().includes(searchTerm.toLowerCase())) || 
-      (appointment.patientCode && appointment.patientCode.includes(searchTerm));
+      appointment.patientCode.includes(searchTerm);
     
     if (activeTab === "calendar" && selectedDate) {
       const appointmentDate = new Date(appointment.date);
@@ -123,9 +122,21 @@ const Appointments = () => {
     toast.success("Rendez-vous ajouté avec succès");
   };
   
-  // Démarrer une séance
-  const handleStartSession = (appointmentId: string, patientId: string) => {
+  // Voir le dossier patient
+  const handleViewPatient = (patientId: string) => {
     navigate(`/patient/${patientId}`);
+  };
+  
+  // Clôturer un rendez-vous
+  const handleCloseAppointment = (appointmentId: string) => {
+    setAppointments(prev => 
+      prev.map(app => 
+        app.id === appointmentId 
+          ? { ...app, status: "completed" } 
+          : app
+      )
+    );
+    toast.success("Rendez-vous clôturé avec succès");
   };
   
   // Jours du calendrier où il y a des rendez-vous
@@ -183,7 +194,7 @@ const Appointments = () => {
               <div className="relative w-64">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Rechercher un patient..."
+                  placeholder="Rechercher par code..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="pl-9"
@@ -205,8 +216,7 @@ const Appointments = () => {
                         <div className="flex items-start justify-between">
                           <div>
                             <div className="flex items-center space-x-2">
-                              <div className="font-medium">{appointment.patientName}</div>
-                              <div className="text-xs bg-muted px-2 py-0.5 rounded">{appointment.patientCode}</div>
+                              <div className="font-medium">Patient #{appointment.patientCode}</div>
                             </div>
                             <div className="flex items-center mt-1 text-sm text-muted-foreground">
                               <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
@@ -230,10 +240,18 @@ const Appointments = () => {
                             </Button>
                             <Button 
                               size="sm"
-                              onClick={() => handleStartSession(appointment.id, appointment.patientId)}
+                              variant="outline"
+                              onClick={() => handleCloseAppointment(appointment.id)}
                             >
-                              <Play className="h-4 w-4 mr-1.5" />
-                              Débuter
+                              <Check className="h-4 w-4 mr-1.5" />
+                              Clôturer
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => handleViewPatient(appointment.patientId)}
+                            >
+                              <FileText className="h-4 w-4 mr-1.5" />
+                              Voir le dossier
                             </Button>
                           </div>
                         </div>
@@ -300,10 +318,7 @@ const Appointments = () => {
                           <div className="flex items-start justify-between">
                             <div>
                               <div className="flex items-center space-x-2">
-                                <div className="font-medium">{appointment.patientName}</div>
-                                <div className="text-xs bg-muted px-2 py-0.5 rounded">
-                                  {appointment.patientCode}
-                                </div>
+                                <div className="font-medium">Patient #{appointment.patientCode}</div>
                               </div>
                               <div className="flex items-center mt-1 text-sm text-muted-foreground">
                                 <Clock className="h-3.5 w-3.5 mr-1.5" />
@@ -326,10 +341,18 @@ const Appointments = () => {
                               </Button>
                               <Button 
                                 size="sm"
-                                onClick={() => handleStartSession(appointment.id, appointment.patientId)}
+                                variant="outline"
+                                onClick={() => handleCloseAppointment(appointment.id)}
                               >
-                                <Play className="h-4 w-4 mr-1.5" />
-                                Débuter
+                                <Check className="h-4 w-4 mr-1.5" />
+                                Clôturer
+                              </Button>
+                              <Button 
+                                size="sm"
+                                onClick={() => handleViewPatient(appointment.patientId)}
+                              >
+                                <FileText className="h-4 w-4 mr-1.5" />
+                                Voir le dossier
                               </Button>
                             </div>
                           </div>

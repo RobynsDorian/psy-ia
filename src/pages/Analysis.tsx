@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import Header from "@/components/layout/Header";
@@ -218,7 +219,6 @@ const Analysis = () => {
                 <RelationshipMap
                   relationships={relationships}
                   patientId="temp"
-                  onExport={handleExportRelationships}
                 />
               </motion.div>
             </TabsContent>
