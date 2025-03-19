@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PatientSession, Appointment } from "@/types/patient";
-import { FileText, Calendar, Plus, Wand2, Filter, Clock, FastForward } from "lucide-react";
+import { FileText, Calendar, Plus, Wand2, Filter, Clock, FastForward, PlayCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AudioRecorder from "@/components/audio/AudioRecorder";
 import TranscriptionEditor from "@/components/transcription/TranscriptionEditor";
@@ -292,7 +292,7 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
                                 size="sm"
                                 onClick={() => setActiveTab("new")}
                               >
-                                <Play className="h-4 w-4 mr-1" />
+                                <PlayCircle className="h-4 w-4 mr-1" />
                                 Débuter
                               </Button>
                             </>

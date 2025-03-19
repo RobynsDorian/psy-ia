@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import Header from "@/components/layout/Header";
@@ -9,24 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { RefreshCw, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-// Types pour les données d'analyse
-interface Relationship {
-  name: string;
-  relation: string;
-  description: string;
-  connections: string[];
-}
-
-interface BackgroundSection {
-  title: string;
-  content: string;
-  icon: "calendar" | "graduation" | "home" | "heart";
-}
+import { PatientRelationship, BackgroundSection } from "@/types/patient";
 
 const Analysis = () => {
   const navigate = useNavigate();
-  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [relationships, setRelationships] = useState<PatientRelationship[]>([]);
   const [summary, setSummary] = useState("");
   const [sections, setSections] = useState<BackgroundSection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,32 +32,37 @@ const Analysis = () => {
     setIsLoading(true);
     setTimeout(() => {
       // Données d'exemple pour les relations
-      const sampleRelationships: Relationship[] = [
+      const sampleRelationships: PatientRelationship[] = [
         {
+          id: "1",
           name: "Mère",
           relation: "Relation parentale",
           description: "Relation tendue et compliquée, avec des attentes élevées et des critiques fréquentes.",
           connections: ["Père", "Sœur (Julie)"]
         },
         {
+          id: "2",
           name: "Père",
           relation: "Relation parentale",
           description: "Relation plus détendue mais passive, n'intervient pas dans les conflits.",
           connections: ["Mère"]
         },
         {
+          id: "3",
           name: "Sœur (Julie)",
           relation: "Relation fraternelle",
           description: "Perçue comme 'la préférée', provoquant des sentiments de jalousie et d'injustice.",
           connections: ["Mère", "Père"]
         },
         {
+          id: "4",
           name: "Grand-père paternel",
           relation: "Relation grand-parentale",
           description: "Figure de soutien importante, décédé récemment. Lien affectif fort et mentor musical.",
           connections: ["Père", "Grand-mère paternelle"]
         },
         {
+          id: "5",
           name: "Grand-mère paternelle",
           relation: "Relation grand-parentale",
           description: "Relation positive mais limitée par des problèmes de santé.",
@@ -226,6 +217,7 @@ const Analysis = () => {
               >
                 <RelationshipMap
                   relationships={relationships}
+                  patientId="temp"
                   onExport={handleExportRelationships}
                 />
               </motion.div>

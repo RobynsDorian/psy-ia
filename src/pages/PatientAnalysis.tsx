@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -9,26 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { ArrowLeft, RefreshCw, Save } from "lucide-react";
-
-// Types pour les données d'analyse
-interface Relationship {
-  name: string;
-  relation: string;
-  description: string;
-  connections: string[];
-}
-
-interface BackgroundSection {
-  title: string;
-  content: string;
-  icon: "calendar" | "graduation" | "home" | "heart";
-}
+import { PatientRelationship, BackgroundSection } from "@/types/patient";
 
 const PatientAnalysis = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [patientCode, setPatientCode] = useState<string>("");
-  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [relationships, setRelationships] = useState<PatientRelationship[]>([]);
   const [summary, setSummary] = useState("");
   const [sections, setSections] = useState<BackgroundSection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,32 +40,37 @@ const PatientAnalysis = () => {
     setIsLoading(true);
     setTimeout(() => {
       // Données d'exemple pour les relations
-      const sampleRelationships: Relationship[] = [
+      const sampleRelationships: PatientRelationship[] = [
         {
+          id: "1",
           name: "Mère",
           relation: "Relation parentale",
           description: "Relation tendue et compliquée, avec des attentes élevées et des critiques fréquentes.",
           connections: ["Père", "Sœur (Julie)"]
         },
         {
+          id: "2",
           name: "Père",
           relation: "Relation parentale",
           description: "Relation plus détendue mais passive, n'intervient pas dans les conflits.",
           connections: ["Mère"]
         },
         {
+          id: "3",
           name: "Sœur (Julie)",
           relation: "Relation fraternelle",
           description: "Perçue comme 'la préférée', provoquant des sentiments de jalousie et d'injustice.",
           connections: ["Mère", "Père"]
         },
         {
+          id: "4",
           name: "Grand-père paternel",
           relation: "Relation grand-parentale",
           description: "Figure de soutien importante, décédé récemment. Lien affectif fort et mentor musical.",
           connections: ["Père", "Grand-mère paternelle"]
         },
         {
+          id: "5",
           name: "Grand-mère paternelle",
           relation: "Relation grand-parentale",
           description: "Relation positive mais limitée par des problèmes de santé.",
@@ -247,6 +238,7 @@ const PatientAnalysis = () => {
               >
                 <RelationshipMap
                   relationships={relationships}
+                  patientId={id || ""}
                   onExport={handleExportRelationships}
                 />
               </motion.div>

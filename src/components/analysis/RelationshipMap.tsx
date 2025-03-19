@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { UserRound, Heart, Users, FileDown, FilePdf, History, RotateCcw, Pen, Save } from "lucide-react";
+import { UserRound, Heart, Users, FileDown, FileText, History, RotateCcw, Pen, Save } from "lucide-react";
 import { PatientRelationship, GenogramVersion } from "@/types/patient";
 
 // Exemple de versions du génogramme
@@ -127,7 +127,7 @@ const RelationshipMap = ({ relationships, patientId }: RelationshipMapProps) => 
                                     variant="outline"
                                     onClick={() => window.open(version.pdfUrl, '_blank')}
                                   >
-                                    <FilePdf className="h-4 w-4 mr-1" />
+                                    <FileText className="h-4 w-4 mr-1" />
                                     Voir
                                   </Button>
                                   {currentVersion.id !== version.id && (
@@ -261,7 +261,7 @@ const RelationshipMap = ({ relationships, patientId }: RelationshipMapProps) => 
                 {currentVersion ? (
                   <div className="text-center space-y-4 w-full h-full flex flex-col items-center justify-center">
                     <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                      <FilePdf className="h-8 w-8 text-primary" />
+                      <FileText className="h-8 w-8 text-primary" />
                     </div>
                     <div>
                       <h3 className="text-lg font-medium">Génogramme (PDF)</h3>
@@ -282,7 +282,7 @@ const RelationshipMap = ({ relationships, patientId }: RelationshipMapProps) => 
                           onClick={() => window.open(currentVersion.pdfUrl, '_blank')}
                           className="rounded-xl"
                         >
-                          <FilePdf className="h-4 w-4 mr-2" />
+                          <FileText className="h-4 w-4 mr-2" />
                           Visualiser le PDF
                         </Button>
                       )}
