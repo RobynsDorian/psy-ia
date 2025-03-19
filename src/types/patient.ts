@@ -69,3 +69,22 @@ export interface StoryFormData {
   type: 'children' | 'adult' | 'therapeutic';
   additionalContext?: string;
 }
+
+export interface Appointment {
+  id: string;
+  patientId: string;
+  patientCode?: string;
+  patientName?: string;
+  date: Date;
+  duration: number; // in minutes
+  notes?: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+}
+
+export interface GenogramVersion {
+  id: string;
+  patientId: string;
+  createdAt: Date;
+  pdfUrl: string;
+  notes?: string;
+}
