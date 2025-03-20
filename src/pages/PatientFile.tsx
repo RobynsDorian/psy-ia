@@ -175,7 +175,7 @@ const PatientFile = () => {
           },
           {
             title: "Relations familiales",
-            content: `Relations tendues avec sa mère, plus distantes mais moins conflictuelles avec son père. Rivalité avec sa sœur Julie qui semble être la "préférée". Le grand-père paternel était une figure de soutien importante.`,
+            content: `Relations tendues avec sa mère, plus distantes mais moins conflictuelles avec son père. Rivalité avec sa sœur Julie qui semble être la "préférée". Le grand-père paternel était une figure de soutien important.`,
             icon: "heart"
           },
           {
@@ -290,33 +290,33 @@ const PatientFile = () => {
         </div>
         
         <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-4 rounded-xl bg-muted/50">
-            <TabsTrigger value="info">
+          <TabsList className="grid w-full max-w-md grid-cols-4 rounded-xl bg-muted/50 custom-tabs-list">
+            <TabsTrigger value="info" className="custom-tab-trigger">
               <ClipboardList className="h-4 w-4 mr-2" />
               Informations
             </TabsTrigger>
-            <TabsTrigger value="sessions">
+            <TabsTrigger value="sessions" className="custom-tab-trigger">
               <Calendar className="h-4 w-4 mr-2" />
               Séances
             </TabsTrigger>
-            <TabsTrigger value="relations">
+            <TabsTrigger value="relations" className="custom-tab-trigger">
               <Users className="h-4 w-4 mr-2" />
               Relations
             </TabsTrigger>
-            <TabsTrigger value="history">
+            <TabsTrigger value="history" className="custom-tab-trigger">
               <FileText className="h-4 w-4 mr-2" />
-              Contes thérapeutiques
+              Contes
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="info" className="space-y-4">
+          <TabsContent value="info" className="space-y-4 custom-tab-content">
             <InformationTab
               patient={patient}
               onUpdatePatient={handleUpdatePatient}
             />
           </TabsContent>
           
-          <TabsContent value="sessions">
+          <TabsContent value="sessions" className="custom-tab-content">
             <SessionsTab
               patientId={patient.id}
               patientCode={patient.code}
@@ -324,7 +324,7 @@ const PatientFile = () => {
             />
           </TabsContent>
           
-          <TabsContent value="relations">
+          <TabsContent value="relations" className="custom-tab-content">
             <RelationsTab
               relationships={relationships}
               onAddRelationship={handleAddRelationship}
@@ -332,7 +332,7 @@ const PatientFile = () => {
             />
           </TabsContent>
           
-          <TabsContent value="history">
+          <TabsContent value="history" className="custom-tab-content">
             <HistoryTab
               patientId={patient.id}
               histories={histories}

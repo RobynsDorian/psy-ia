@@ -1,9 +1,8 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GeneratedBackground, GeneratedStory, StoryFormData } from "@/types/patient";
-import { Calendar, Heart, Home, GraduationCap, Plus, Wand2, FileText, Book, Sparkles } from "lucide-react";
+import { Calendar, Heart, Home, GraduationCap, Plus, Wand2, FileText, Book, Sparkles, Download, Upload } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -11,7 +10,6 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -87,7 +85,10 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
   const [selectedStory, setSelectedStory] = useState<GeneratedStory | null>(null);
   const [isStoryDialogOpen, setIsStoryDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  
+  const [textFileContent, setTextFileContent] = useState<string | null>(null);
+  const [isTextFileDialogOpen, setIsTextFileDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const storyForm = useForm<z.infer<typeof storyFormSchema>>({
     resolver: zodResolver(storyFormSchema),
     defaultValues: {
@@ -96,7 +97,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
       additionalContext: "",
     },
   });
-  
+
   const onStoryFormSubmit = (values: z.infer<typeof storyFormSchema>) => {
     setIsGeneratingStory(true);
     
@@ -122,40 +123,94 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
       toast.success("Conte généré avec succès !");
     }, 3000);
   };
-  
+
   const handleViewStory = (story: GeneratedStory) => {
     setSelectedStory(story);
     setCurrentPage(0);
     setIsStoryDialogOpen(true);
   };
-  
+
   const nextPage = () => {
     if (selectedStory && currentPage < selectedStory.pages.length - 1) {
       setCurrentPage(prev => prev + 1);
     }
   };
-  
+
   const prevPage = () => {
     if (currentPage > 0) {
       setCurrentPage(prev => prev - 1);
     }
   };
-  
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (file.type !== "text/plain") {
+      toast.error("Veuillez sélectionner un fichier texte (.txt)");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setTextFileContent(content);
+      setIsTextFileDialogOpen(true);
+    };
+    reader.onerror = () => {
+      toast.error("Erreur lors de la lecture du fichier");
+    };
+    
+    reader.readAsText(file);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
+  const downloadHistory = (history: GeneratedBackground) => {
+    let content = `${history.title || "Historique patient"}\n`;
+    content += `Généré le ${format(history.createdAt, 'PPP', { locale: fr })}\n\n`;
+    content += `RÉSUMÉ:\n${history.summary}\n\n`;
+    
+    history.sections.forEach(section => {
+      content += `${section.title.toUpperCase()}:\n${section.content}\n\n`;
+    });
+    
+    const element = document.createElement("a");
+    const file = new Blob([content], { type: "text/plain;charset=utf-8" });
+    element.href = URL.createObjectURL(file);
+    element.download = `historique_${history.id}_${format(history.createdAt, 'yyyy-MM-dd')}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    
+    toast.success("Historique téléchargé");
+  };
+
   return (
     <div className="space-y-4 overflow-x-hidden">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept=".txt"
+        className="hidden"
+      />
+      
       <Tabs defaultValue={selectedTab} value={selectedTab} onValueChange={(value) => setSelectedTab(value as "stories" | "histories")} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="stories">
+        <TabsList className="grid w-full max-w-md grid-cols-2 custom-tabs-list">
+          <TabsTrigger value="stories" className="custom-tab-trigger">
             <Book className="h-4 w-4 mr-2" />
             Contes thérapeutiques
           </TabsTrigger>
-          <TabsTrigger value="histories">
+          <TabsTrigger value="histories" className="custom-tab-trigger">
             <FileText className="h-4 w-4 mr-2" />
             Historiques
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="stories" className="space-y-4 mt-6">
+        <TabsContent value="stories" className="space-y-4 mt-6 custom-tab-content">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -227,7 +282,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
           </Card>
         </TabsContent>
 
-        <TabsContent value="histories" className="space-y-4 mt-6">
+        <TabsContent value="histories" className="space-y-4 mt-6 custom-tab-content">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -235,19 +290,28 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                   <CardTitle>Historiques</CardTitle>
                   <CardDescription>Analyses contextuelles du patient</CardDescription>
                 </div>
-                <Button disabled={isGeneratingBackground} onClick={generatePatientBackground}>
-                  {isGeneratingBackground ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                      Génération...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="mr-2 h-4 w-4" />
-                      Générer l'historique
-                    </>
-                  )}
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline"
+                    onClick={triggerFileInput}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Ouvrir fichier texte
+                  </Button>
+                  <Button disabled={isGeneratingBackground} onClick={generatePatientBackground}>
+                    {isGeneratingBackground ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                        Génération...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        Générer l'historique
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -257,6 +321,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                     <TableHead>Titre</TableHead>
                     <TableHead className="hidden md:table-cell">Date de création</TableHead>
                     <TableHead>Résumé</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -274,12 +339,35 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                         </button>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{format(history.createdAt, "PPP", { locale: fr })}</TableCell>
-                      <TableCell>{history.summary}</TableCell>
+                      <TableCell className="max-w-xs truncate">{history.summary}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedHistory(history);
+                              setIsHistoryDialogOpen(true);
+                            }}
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            Voir
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => downloadHistory(history)}
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            Exporter
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                   {histories.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center">
+                      <TableCell colSpan={4} className="text-center">
                         Aucun historique disponible.
                       </TableCell>
                     </TableRow>
@@ -472,6 +560,31 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isTextFileDialogOpen} onOpenChange={setIsTextFileDialogOpen}>
+        <DialogContent className="sm:max-w-[650px]">
+          <DialogHeader>
+            <DialogTitle>Contenu du fichier texte</DialogTitle>
+            <DialogDescription>
+              Visualisation du fichier texte importé
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[70vh]">
+            <div className="border rounded-lg p-6 bg-muted/10">
+              <pre className="whitespace-pre-wrap font-mono text-sm">
+                {textFileContent}
+              </pre>
+            </div>
+          </ScrollArea>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTextFileDialogOpen(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
