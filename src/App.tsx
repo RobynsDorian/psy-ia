@@ -10,8 +10,10 @@ import Patients from "./pages/Patients";
 import Appointments from "./pages/Appointments";
 import PatientFile from "./pages/PatientFile";
 import { PatientAnalysis } from "./pages/PatientAnalysis"; // Changed from default to named import
+import AITools from "./pages/AITools";
 import NotFound from "./pages/NotFound";
 import { MainSidebarWrapper } from "./components/layout/MainSidebar";
+import "./App.css";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,7 @@ const App = () => (
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/patient/:id" element={<PatientFile />} />
               <Route path="/patient/:id/analysis" element={<PatientAnalysis />} />
+              <Route path="/ai-tools" element={<AITools />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

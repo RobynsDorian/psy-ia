@@ -1,42 +1,74 @@
+
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  text-align: left;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body {
+  @apply bg-background text-foreground antialiased overflow-x-hidden;
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.glass-panel {
+  @apply bg-white/90 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl;
+}
+
+.section-padding {
+  @apply py-12 px-6 md:px-10;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.slide-in {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  to { 
+    transform: translateY(0); 
+    opacity: 1;
   }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.gradient-card {
+  @apply bg-gradient-to-br from-white to-muted/30;
 }
 
-.card {
-  padding: 2em;
+.shadow-soft {
+  box-shadow: 0 10px 50px -20px rgba(0, 0, 0, 0.1);
 }
 
-.read-the-docs {
-  color: #888;
+.rounded-xl-plus {
+  border-radius: 1.25rem;
+}
+
+/* Animation for page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
 }

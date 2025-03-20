@@ -150,7 +150,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
           </TabsTrigger>
           <TabsTrigger value="stories">
             <Book className="h-4 w-4 mr-2" />
-            Histoires
+            Contes thérapeutiques
           </TabsTrigger>
         </TabsList>
 
@@ -233,8 +233,8 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Histoires thérapeutiques</CardTitle>
-                  <CardDescription>Histoires personnalisées basées sur les historiques du patient</CardDescription>
+                  <CardTitle>Contes thérapeutiques</CardTitle>
+                  <CardDescription>Contes personnalisés basés sur les historiques du patient</CardDescription>
                 </div>
                 <Button 
                   onClick={() => setIsStoryFormOpen(true)}
@@ -248,7 +248,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                   ) : (
                     <>
                       <Sparkles className="mr-2 h-4 w-4" />
-                      Nouvelle histoire
+                      Nouveau conte
                     </>
                   )}
                 </Button>
@@ -288,13 +288,13 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                 </Table>
               ) : (
                 <div className="text-center py-12 text-muted-foreground">
-                  <p>Aucune histoire n'a encore été générée pour ce patient.</p>
+                  <p>Aucun conte thérapeutique n'a encore été généré pour ce patient.</p>
                   <Button 
                     className="mt-4" 
                     onClick={() => setIsStoryFormOpen(true)}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Générer une histoire
+                    Générer un conte
                   </Button>
                 </div>
               )}
@@ -361,9 +361,9 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
       <Dialog open={isStoryFormOpen} onOpenChange={setIsStoryFormOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Générer une nouvelle histoire</DialogTitle>
+            <DialogTitle>Générer un nouveau conte</DialogTitle>
             <DialogDescription>
-              Créez une histoire thérapeutique personnalisée basée sur l'historique du patient.
+              Créez un conte thérapeutique personnalisé basé sur l'historique du patient.
             </DialogDescription>
           </DialogHeader>
           

@@ -12,7 +12,7 @@ import {
   SidebarGroup
 } from "@/components/ui/sidebar";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Users, Calendar } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Sparkles } from "lucide-react";
 
 interface SidebarProps {
   children: React.ReactNode;
@@ -52,6 +52,11 @@ const MainSidebar = () => {
       title: "Rendez-vous",
       path: "/appointments",
       icon: Calendar
+    },
+    {
+      title: "Outils IA",
+      path: "/ai-tools",
+      icon: Sparkles
     }
   ];
   
@@ -64,7 +69,7 @@ const MainSidebar = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.3 }}
         >
-          <div className="text-xl font-bold">SONALIS</div>
+          <div className="text-xl font-bold text-sonalis-primary">PSY-IA</div>
         </motion.div>
       </SidebarHeader>
       
@@ -89,7 +94,7 @@ const MainSidebar = () => {
       
       <SidebarFooter>
         <div className="px-4 py-2 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} SONALIS
+          © {new Date().getFullYear()} PSY-IA
         </div>
       </SidebarFooter>
     </Sidebar>

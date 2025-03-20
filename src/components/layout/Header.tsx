@@ -9,19 +9,19 @@ const Header = () => {
   
   return (
     <motion.header 
-      className="w-full py-6 px-8 flex items-center justify-between"
+      className="w-full py-6 px-8 flex items-center justify-between bg-white/50 backdrop-blur-sm border-b"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <motion.h1 
-        className="text-xl font-medium cursor-pointer"
+        className="text-xl font-medium cursor-pointer text-sonalis-primary"
         onClick={() => navigate("/")}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        SONALIS
+        PSY-IA
       </motion.h1>
     </motion.header>
   );
