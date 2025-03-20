@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Save, Play, FileText, Wand2 } from "lucide-react";
+import { Save, Play, FileText, Wand2, PenLine } from "lucide-react";
 
 interface TranscriptionEditorProps {
   transcription: string;
@@ -22,6 +22,7 @@ const TranscriptionEditor = ({
 }: TranscriptionEditorProps) => {
   const [editedText, setEditedText] = useState(transcription);
   const [activeTab, setActiveTab] = useState("edit");
+  const [psychNotes, setPsychNotes] = useState("");
   
   useEffect(() => {
     setEditedText(transcription);
@@ -29,7 +30,8 @@ const TranscriptionEditor = ({
   
   const handleSave = () => {
     onSave(editedText);
-    toast.success("Transcription sauvegardée");
+    // Save the psych notes as well (in a real application, you would send this to the server)
+    toast.success("Transcription et notes sauvegardées");
   };
   
   const handleAnalyze = () => {
@@ -92,16 +94,42 @@ const TranscriptionEditor = ({
           <Textarea
             value={editedText}
             onChange={(e) => setEditedText(e.target.value)}
-            className="h-full min-h-[400px] p-4 rounded-xl resize-none subtle-scroll text-base leading-relaxed"
+            className="h-[300px] p-4 rounded-xl resize-none subtle-scroll text-base leading-relaxed"
             placeholder="La transcription apparaîtra ici..."
             disabled={isProcessing}
           />
+          
+          <div className="mt-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <PenLine className="w-4 h-4 text-primary" />
+              <h3 className="font-medium">Notes du psychologue</h3>
+            </div>
+            <Textarea
+              value={psychNotes}
+              onChange={(e) => setPsychNotes(e.target.value)}
+              className="h-[100px] p-4 rounded-xl resize-none subtle-scroll text-base"
+              placeholder="Ajoutez vos notes et observations personnelles ici..."
+              disabled={isProcessing}
+            />
+          </div>
         </TabsContent>
         
         <TabsContent value="preview" className="flex-1 mt-0">
-          <div className="h-full min-h-[400px] p-4 bg-muted/30 rounded-xl subtle-scroll text-base leading-relaxed whitespace-pre-wrap">
+          <div className="h-[300px] p-4 bg-muted/30 rounded-xl subtle-scroll text-base leading-relaxed whitespace-pre-wrap">
             {editedText || "Aucune transcription à afficher."}
           </div>
+          
+          {psychNotes && (
+            <div className="mt-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <PenLine className="w-4 h-4 text-primary" />
+                <h3 className="font-medium">Notes du psychologue</h3>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-xl subtle-scroll text-base whitespace-pre-wrap">
+                {psychNotes}
+              </div>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </motion.div>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Tabs, 
@@ -41,22 +42,25 @@ const AITools = () => {
   const [selectedTab, setSelectedTab] = useState("genograms");
   const [selectedPatient, setSelectedPatient] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [storyTitle, setStoryTitle] = useState("");
+  const [storyType, setStoryType] = useState("therapeutic");
+  const [additionalContext, setAdditionalContext] = useState("");
   
   const patients = [
-    { id: "1", name: "Sophie Martin" },
-    { id: "2", name: "Lucas Dubois" },
-    { id: "3", name: "Emma Lefebvre" },
-    { id: "4", name: "Noah Bernard" },
+    { id: "1", code: "MART-S-01" },
+    { id: "2", code: "DUBO-L-02" },
+    { id: "3", code: "LEFV-E-03" },
+    { id: "4", code: "BERN-N-04" },
   ];
   
   const genograms = [
-    { id: "1", patientId: "1", patientName: "Sophie Martin", createdAt: new Date("2023-10-25") },
-    { id: "2", patientId: "2", patientName: "Lucas Dubois", createdAt: new Date("2023-11-12") },
+    { id: "1", patientId: "1", patientCode: "MART-S-01", createdAt: new Date("2023-10-25") },
+    { id: "2", patientId: "2", patientCode: "DUBO-L-02", createdAt: new Date("2023-11-12") },
   ];
   
   const therapeuticStories = [
-    { id: "1", patientId: "1", patientName: "Sophie Martin", title: "Le Voyage Intérieur", createdAt: new Date("2023-10-28") },
-    { id: "2", patientId: "3", patientName: "Emma Lefebvre", title: "La Forêt des Émotions", createdAt: new Date("2023-11-15") },
+    { id: "1", patientId: "1", patientCode: "MART-S-01", title: "Le Voyage Intérieur", createdAt: new Date("2023-10-28") },
+    { id: "2", patientId: "3", patientCode: "LEFV-E-03", title: "La Forêt des Émotions", createdAt: new Date("2023-11-15") },
   ];
   
   const handleGenerate = () => {
@@ -77,7 +81,7 @@ const AITools = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-sonalis-primary">Outils IA</h1>
+        <h1 className="text-3xl font-semibold">Outils IA</h1>
         <p className="text-muted-foreground mt-2">
           Générez et consultez les outils d'intelligence artificielle pour vos patients
         </p>
@@ -106,15 +110,15 @@ const AITools = () => {
             <CardContent>
               <div className="grid gap-6">
                 <div className="flex flex-col space-y-1.5">
-                  <label htmlFor="patient-select">Patient</label>
+                  <label htmlFor="patient-select">Code Patient</label>
                   <Select value={selectedPatient} onValueChange={setSelectedPatient}>
                     <SelectTrigger id="patient-select">
-                      <SelectValue placeholder="Sélectionner un patient" />
+                      <SelectValue placeholder="Sélectionner un code patient" />
                     </SelectTrigger>
                     <SelectContent position="popper">
                       {patients.map(patient => (
                         <SelectItem key={patient.id} value={patient.id}>
-                          {patient.name}
+                          {patient.code}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -175,7 +179,7 @@ const AITools = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Patient</TableHead>
+                      <TableHead>Code Patient</TableHead>
                       <TableHead>Date de création</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -183,7 +187,7 @@ const AITools = () => {
                   <TableBody>
                     {genograms.map(genogram => (
                       <TableRow key={genogram.id}>
-                        <TableCell>{genogram.patientName}</TableCell>
+                        <TableCell>{genogram.patientCode}</TableCell>
                         <TableCell>{format(genogram.createdAt, 'PPP', { locale: fr })}</TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
@@ -219,15 +223,15 @@ const AITools = () => {
             <CardContent>
               <div className="grid gap-6">
                 <div className="flex flex-col space-y-1.5">
-                  <label htmlFor="story-patient-select">Patient</label>
+                  <label htmlFor="story-patient-select">Code Patient</label>
                   <Select value={selectedPatient} onValueChange={setSelectedPatient}>
                     <SelectTrigger id="story-patient-select">
-                      <SelectValue placeholder="Sélectionner un patient" />
+                      <SelectValue placeholder="Sélectionner un code patient" />
                     </SelectTrigger>
                     <SelectContent position="popper">
                       {patients.map(patient => (
                         <SelectItem key={patient.id} value={patient.id}>
-                          {patient.name}
+                          {patient.code}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -236,12 +240,17 @@ const AITools = () => {
                 
                 <div className="flex flex-col space-y-1.5">
                   <label htmlFor="story-title">Titre du conte</label>
-                  <Input id="story-title" placeholder="Le voyage intérieur" />
+                  <Input 
+                    id="story-title" 
+                    placeholder="Le voyage intérieur" 
+                    value={storyTitle}
+                    onChange={(e) => setStoryTitle(e.target.value)}
+                  />
                 </div>
                 
                 <div className="flex flex-col space-y-1.5">
                   <label htmlFor="story-type">Type de conte</label>
-                  <Select defaultValue="therapeutic">
+                  <Select value={storyType} onValueChange={setStoryType}>
                     <SelectTrigger id="story-type">
                       <SelectValue placeholder="Sélectionner un type" />
                     </SelectTrigger>
@@ -259,6 +268,8 @@ const AITools = () => {
                     id="story-context"
                     placeholder="Décrivez les thèmes à aborder dans le conte..."
                     className="resize-none h-24"
+                    value={additionalContext}
+                    onChange={(e) => setAdditionalContext(e.target.value)}
                   />
                 </div>
               </div>
@@ -307,7 +318,7 @@ const AITools = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Patient</TableHead>
+                      <TableHead>Code Patient</TableHead>
                       <TableHead>Titre</TableHead>
                       <TableHead>Date de création</TableHead>
                       <TableHead>Actions</TableHead>
@@ -316,7 +327,7 @@ const AITools = () => {
                   <TableBody>
                     {therapeuticStories.map(story => (
                       <TableRow key={story.id}>
-                        <TableCell>{story.patientName}</TableCell>
+                        <TableCell>{story.patientCode}</TableCell>
                         <TableCell>{story.title}</TableCell>
                         <TableCell>{format(story.createdAt, 'PPP', { locale: fr })}</TableCell>
                         <TableCell>

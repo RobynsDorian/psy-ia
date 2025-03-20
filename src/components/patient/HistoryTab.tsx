@@ -60,7 +60,7 @@ const storyTemplates = [
 ];
 
 const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePatientBackground }: HistoryTabProps) => {
-  const [selectedTab, setSelectedTab] = useState<"histories" | "stories">("histories");
+  const [selectedTab, setSelectedTab] = useState<"stories" | "histories">("stories");
   const [selectedHistory, setSelectedHistory] = useState<GeneratedBackground | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [stories, setStories] = useState<GeneratedStory[]>(sampleStories.filter(s => s.patientId === patientId));
@@ -142,91 +142,17 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
   
   return (
     <div className="space-y-4">
-      <Tabs defaultValue={selectedTab} value={selectedTab} onValueChange={(value) => setSelectedTab(value as "histories" | "stories")} className="w-full">
+      <Tabs defaultValue={selectedTab} value={selectedTab} onValueChange={(value) => setSelectedTab(value as "stories" | "histories")} className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="histories">
-            <FileText className="h-4 w-4 mr-2" />
-            Historiques
-          </TabsTrigger>
           <TabsTrigger value="stories">
             <Book className="h-4 w-4 mr-2" />
             Contes thérapeutiques
           </TabsTrigger>
+          <TabsTrigger value="histories">
+            <FileText className="h-4 w-4 mr-2" />
+            Historiques
+          </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="histories" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Historiques générés</CardTitle>
-                  <CardDescription>Résumés du parcours du patient générés par l'IA</CardDescription>
-                </div>
-                <Button 
-                  onClick={generatePatientBackground}
-                  disabled={isGeneratingBackground}
-                >
-                  {isGeneratingBackground ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                      Génération...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Nouvel historique
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {histories.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Titre</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {histories.map((history) => (
-                      <TableRow key={history.id} className="cursor-pointer hover:bg-muted/60">
-                        <TableCell>
-                          {history.createdAt ? (
-                            format(history.createdAt, 'PPP', { locale: fr })
-                          ) : (
-                            "Date inconnue"
-                          )}
-                        </TableCell>
-                        <TableCell>{history.title || "Historique patient"}</TableCell>
-                        <TableCell>
-                          <Button variant="outline" size="sm" onClick={() => handleViewHistory(history)}>
-                            <FileText className="h-4 w-4 mr-1" />
-                            Voir
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <p>Aucun historique n'a encore été généré pour ce patient.</p>
-                  <Button 
-                    className="mt-4" 
-                    onClick={generatePatientBackground}
-                    disabled={isGeneratingBackground}
-                  >
-                    <Wand2 className="mr-2 h-4 w-4" />
-                    Générer un historique
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="stories" className="space-y-4 mt-6">
           <Card>
@@ -295,6 +221,80 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
                     Générer un conte
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="histories" className="space-y-4 mt-6">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Historiques générés</CardTitle>
+                  <CardDescription>Résumés du parcours du patient générés par l'IA</CardDescription>
+                </div>
+                <Button 
+                  onClick={generatePatientBackground}
+                  disabled={isGeneratingBackground}
+                >
+                  {isGeneratingBackground ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                      Génération...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Nouvel historique
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {histories.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Titre</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {histories.map((history) => (
+                      <TableRow key={history.id} className="cursor-pointer hover:bg-muted/60">
+                        <TableCell>
+                          {history.createdAt ? (
+                            format(history.createdAt, 'PPP', { locale: fr })
+                          ) : (
+                            "Date inconnue"
+                          )}
+                        </TableCell>
+                        <TableCell>{history.title || "Historique patient"}</TableCell>
+                        <TableCell>
+                          <Button variant="outline" size="sm" onClick={() => handleViewHistory(history)}>
+                            <FileText className="h-4 w-4 mr-1" />
+                            Voir
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Aucun historique n'a encore été généré pour ce patient.</p>
+                  <Button 
+                    className="mt-4" 
+                    onClick={generatePatientBackground}
+                    disabled={isGeneratingBackground}
+                  >
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Générer un historique
                   </Button>
                 </div>
               )}
