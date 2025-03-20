@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Tabs, 
@@ -36,14 +35,13 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { motion } from "framer-motion";
-import { Family, Book, Network, Sparkles, SearchIcon } from "lucide-react";
+import { Users, Book, Network, Sparkles, SearchIcon } from "lucide-react";
 
 const AITools = () => {
   const [selectedTab, setSelectedTab] = useState("genograms");
   const [selectedPatient, setSelectedPatient] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   
-  // Mock data for demos
   const patients = [
     { id: "1", name: "Sophie Martin" },
     { id: "2", name: "Lucas Dubois" },
@@ -66,10 +64,8 @@ const AITools = () => {
     
     setIsGenerating(true);
     
-    // Simulate generation process
     setTimeout(() => {
       setIsGenerating(false);
-      // Here you would typically add the new item to the list
     }, 3000);
   };
   
@@ -90,7 +86,7 @@ const AITools = () => {
       <Tabs defaultValue={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
           <TabsTrigger value="genograms" className="flex items-center">
-            <Family className="mr-2 h-4 w-4" />
+            <Users className="mr-2 h-4 w-4" />
             Génogrammes
           </TabsTrigger>
           <TabsTrigger value="stories" className="flex items-center">
