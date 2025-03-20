@@ -220,7 +220,7 @@ const AITools = () => {
                 Créez un conte personnalisé adapté aux besoins de votre patient
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="max-h-[70vh] overflow-y-auto">
               <div className="grid gap-6">
                 <div className="flex flex-col space-y-1.5">
                   <label htmlFor="story-patient-select">Code Patient</label>

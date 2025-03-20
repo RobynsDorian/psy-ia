@@ -17,6 +17,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface HistoryTabProps {
   patientId: string;
@@ -367,99 +368,100 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
             </DialogDescription>
           </DialogHeader>
           
-          <Form {...storyForm}>
-            <form onSubmit={storyForm.handleSubmit(onStoryFormSubmit)} className="space-y-4">
-              <FormField
-                control={storyForm.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Titre de l'histoire</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Le voyage intérieur" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={storyForm.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type d'histoire</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <ScrollArea className="max-h-[70vh]">
+            <Form {...storyForm}>
+              <form onSubmit={storyForm.handleSubmit(onStoryFormSubmit)} className="space-y-4 px-1">
+                <FormField
+                  control={storyForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Titre de l'histoire</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un type" />
-                        </SelectTrigger>
+                        <Input placeholder="Le voyage intérieur" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="children">Pour enfant</SelectItem>
-                        <SelectItem value="adult">Pour adulte</SelectItem>
-                        <SelectItem value="therapeutic">Thérapeutique</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Choisissez le style et le public cible de l'histoire.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={storyForm.control}
-                name="additionalContext"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contexte supplémentaire (optionnel)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Notez ici toute information spécifique à inclure dans l'histoire..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Ajoutez des éléments particuliers que vous souhaitez voir apparaître dans l'histoire.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="pt-4">
-                <h3 className="text-sm font-medium mb-2">Modèles disponibles</h3>
-                <div className="grid grid-cols-1 gap-2">
-                  {storyTemplates.map((template) => (
-                    <div 
-                      key={template.id} 
-                      className="flex items-start p-3 border rounded-md cursor-pointer hover:bg-muted/30"
-                      onClick={() => storyForm.setValue("title", template.title)}
-                    >
-                      <div>
-                        <p className="font-medium">{template.title}</p>
-                        <p className="text-sm text-muted-foreground">{template.description}</p>
-                        <div className="mt-1">
-                          <span className="text-xs bg-muted px-2 py-1 rounded-full">
-                            {template.type === "children" ? "Enfant" : 
-                             template.type === "adult" ? "Adulte" : "Thérapeutique"}
-                          </span>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={storyForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type d'histoire</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="children">Pour enfant</SelectItem>
+                          <SelectItem value="adult">Pour adulte</SelectItem>
+                          <SelectItem value="therapeutic">Thérapeutique</SelectItem>
+                        </SelectContent>
+                        <FormDescription>
+                          Choisissez le style et le public cible de l'histoire.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                />
+                
+                <FormField
+                  control={storyForm.control}
+                  name="additionalContext"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contexte supplémentaire (optionnel)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Notez ici toute information spécifique à inclure dans l'histoire..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Ajoutez des éléments particuliers que vous souhaitez voir apparaître dans l'histoire.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="pt-4">
+                  <h3 className="text-sm font-medium mb-2">Modèles disponibles</h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {storyTemplates.map((template) => (
+                      <div 
+                        key={template.id} 
+                        className="flex items-start p-3 border rounded-md cursor-pointer hover:bg-muted/30"
+                        onClick={() => storyForm.setValue("title", template.title)}
+                      >
+                        <div>
+                          <p className="font-medium">{template.title}</p>
+                          <p className="text-sm text-muted-foreground">{template.description}</p>
+                          <div className="mt-1">
+                            <span className="text-xs bg-muted px-2 py-1 rounded-full">
+                              {template.type === "children" ? "Enfant" : 
+                               template.type === "adult" ? "Adulte" : "Thérapeutique"}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-              
-              <DialogFooter>
-                <Button type="submit" disabled={isGeneratingStory}>
-                  Générer l'histoire
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
+                
+                <DialogFooter>
+                  <Button type="submit" disabled={isGeneratingStory}>
+                    Générer l'histoire
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
       

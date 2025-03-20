@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -306,7 +305,7 @@ const PatientFile = () => {
             </TabsTrigger>
             <TabsTrigger value="history">
               <FileText className="h-4 w-4 mr-2" />
-              Historiques
+              Contes thérapeutiques
             </TabsTrigger>
           </TabsList>
           

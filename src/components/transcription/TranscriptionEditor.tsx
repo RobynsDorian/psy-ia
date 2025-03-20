@@ -102,7 +102,7 @@ const TranscriptionEditor = ({
           <div className="mt-4">
             <div className="flex items-center space-x-2 mb-2">
               <PenLine className="w-4 h-4 text-primary" />
-              <h3 className="font-medium">Notes du psychologue</h3>
+              <h3 className="font-medium">Notes additionnelles</h3>
             </div>
             <Textarea
               value={psychNotes}
@@ -123,7 +123,7 @@ const TranscriptionEditor = ({
             <div className="mt-4">
               <div className="flex items-center space-x-2 mb-2">
                 <PenLine className="w-4 h-4 text-primary" />
-                <h3 className="font-medium">Notes du psychologue</h3>
+                <h3 className="font-medium">Notes additionnelles</h3>
               </div>
               <div className="p-4 bg-muted/30 rounded-xl subtle-scroll text-base whitespace-pre-wrap">
                 {psychNotes}
