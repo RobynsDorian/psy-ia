@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +35,7 @@ const sampleStories: GeneratedStory[] = [
     type: "therapeutic",
     content: "Il était une fois, dans un pays lointain...",
     createdAt: new Date(new Date().setDate(new Date().getDate() - 10)),
+    pages: ["Il était une fois, dans un pays lointain...", "Le héros découvre...", "À la fin..."]
   },
   {
     id: "2",
@@ -42,6 +44,7 @@ const sampleStories: GeneratedStory[] = [
     type: "children",
     content: "Un petit garçon nommé Léo...",
     createdAt: new Date(new Date().setDate(new Date().getDate() - 5)),
+    pages: ["Un petit garçon nommé Léo...", "Un jour, il rencontra...", "Cette rencontre lui apprit..."]
   },
 ];
 
@@ -49,19 +52,19 @@ const storyTemplates = [
   {
     id: "template-1",
     title: "Le voyage du héros",
-    type: "therapeutic",
+    type: "therapeutic" as const,
     description: "Une histoire de transformation personnelle à travers des épreuves.",
   },
   {
     id: "template-2",
     title: "Le secret de la forêt enchantée",
-    type: "children",
+    type: "children" as const,
     description: "Une aventure magique pour les enfants, pleine de leçons de vie.",
   },
   {
     id: "template-3",
     title: "La quête de soi",
-    type: "adult",
+    type: "adult" as const,
     description: "Une histoire introspective pour les adultes, explorant les thèmes de l'identité et du but.",
   },
 ];
@@ -81,8 +84,11 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState<GeneratedBackground | null>(null);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [selectedStory, setSelectedStory] = useState<GeneratedStory | null>(null);
+  const [isStoryDialogOpen, setIsStoryDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   
-  const storyForm = useForm<StoryFormData>({
+  const storyForm = useForm<z.infer<typeof storyFormSchema>>({
     resolver: zodResolver(storyFormSchema),
     defaultValues: {
       title: "",
@@ -91,7 +97,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
     },
   });
   
-  const onStoryFormSubmit = (values: StoryFormData) => {
+  const onStoryFormSubmit = (values: z.infer<typeof storyFormSchema>) => {
     setIsGeneratingStory(true);
     
     setTimeout(() => {
@@ -102,6 +108,12 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
         type: values.type,
         content: `Ceci est un conte généré automatiquement basé sur le type "${values.type}" et le contexte supplémentaire : ${values.additionalContext || "aucun"}.`,
         createdAt: new Date(),
+        pages: [
+          "Il était une fois un enfant qui se sentait différent...",
+          "Au fil de son aventure, il découvrit...",
+          "Cette découverte lui montra que...",
+          "À la fin, il comprit que sa différence était sa plus grande force."
+        ]
       };
       
       setStories((prevStories) => [newStory, ...prevStories]);
@@ -111,8 +123,26 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
     }, 3000);
   };
   
+  const handleViewStory = (story: GeneratedStory) => {
+    setSelectedStory(story);
+    setCurrentPage(0);
+    setIsStoryDialogOpen(true);
+  };
+  
+  const nextPage = () => {
+    if (selectedStory && currentPage < selectedStory.pages.length - 1) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+  
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-hidden">
       <Tabs defaultValue={selectedTab} value={selectedTab} onValueChange={(value) => setSelectedTab(value as "stories" | "histories")} className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="stories">
@@ -158,29 +188,35 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                     <TableHead>Titre</TableHead>
                     <TableHead className="hidden md:table-cell">Type</TableHead>
                     <TableHead>Date de création</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {stories.map((story) => (
                     <TableRow key={story.id}>
                       <TableCell>
-                        <button
-                          className="hover:underline text-left"
-                          onClick={() => {
-                            // setSelectedStory(story);
-                            // setIsStoryDialogOpen(true);
-                          }}
-                        >
-                          {story.title}
-                        </button>
+                        <span className="font-medium">{story.title}</span>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">{story.type}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {story.type === "children" ? "Pour enfant" : 
+                         story.type === "adult" ? "Pour adulte" : "Thérapeutique"}
+                      </TableCell>
                       <TableCell>{format(story.createdAt, "PPP", { locale: fr })}</TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleViewStory(story)}
+                        >
+                          <Book className="h-4 w-4 mr-2" />
+                          Lire
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                   {stories.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center">
+                      <TableCell colSpan={4} className="text-center">
                         Aucun conte disponible.
                       </TableCell>
                     </TableRow>
@@ -292,7 +328,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[60vh] pr-4 overflow-y-auto">
+          <ScrollArea className="max-h-[60vh] pr-4">
             <Form {...storyForm}>
               <form onSubmit={storyForm.handleSubmit(onStoryFormSubmit)} className="space-y-4 px-1">
                 <FormField
@@ -340,7 +376,7 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                   name="additionalContext"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contexte supplémentaire (optionnel)</FormLabel>
+                      <FormLabel>Notes additionnelles (optionnel)</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Notez ici toute information spécifique à inclure dans l'histoire..."
@@ -393,7 +429,51 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
           </ScrollArea>
         </DialogContent>
       </Dialog>
-      
+
+      <Dialog open={isStoryDialogOpen} onOpenChange={setIsStoryDialogOpen}>
+        <DialogContent className="sm:max-w-[650px]">
+          <DialogHeader>
+            <DialogTitle>{selectedStory?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedStory?.createdAt && format(selectedStory.createdAt, "PPP", { locale: fr })}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {selectedStory && (
+              <div className="border rounded-lg p-6 bg-muted/10">
+                <div className="prose max-w-none mb-6">
+                  <p className="text-lg">{selectedStory.pages[currentPage]}</p>
+                </div>
+                
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      disabled={currentPage === 0} 
+                      onClick={prevPage}
+                    >
+                      Page précédente
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      disabled={!selectedStory.pages || currentPage === selectedStory.pages.length - 1} 
+                      onClick={nextPage}
+                    >
+                      Page suivante
+                    </Button>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Page {currentPage + 1} sur {selectedStory.pages.length}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
