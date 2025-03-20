@@ -402,12 +402,13 @@ const HistoryTab = ({ patientId, histories, isGeneratingBackground, generatePati
                           <SelectItem value="adult">Pour adulte</SelectItem>
                           <SelectItem value="therapeutic">Thérapeutique</SelectItem>
                         </SelectContent>
-                        <FormDescription>
-                          Choisissez le style et le public cible de l'histoire.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                      </Select>
+                      <FormDescription>
+                        Choisissez le style et le public cible de l'histoire.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
                 
                 <FormField
