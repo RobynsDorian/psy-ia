@@ -52,6 +52,18 @@ body {
   border-radius: 1.25rem;
 }
 
+/* Scroll behavior */
+.dialog-content {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Prevent horizontal overflow */
+.overflow-control {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 /* Animation for page transitions */
 .page-transition-enter {
   opacity: 0;
