@@ -11,11 +11,7 @@ interface LeadsTabProps {
 
 const LeadsTab = ({ patientId }: LeadsTabProps) => {
   const [isGeneratingLeads, setIsGeneratingLeads] = useState(false);
-  const [therapyLeads, setTherapyLeads] = useState<string[]>([
-    "Explorer davantage les relations avec la figure maternelle",
-    "Travailler sur les techniques de gestion de l'anxiété",
-    "Approfondir le sentiment d'infériorité vis-à-vis de la sœur"
-  ]);
+  const [therapyLeads, setTherapyLeads] = useState<string[]>([]);
 
   const generateNewLeads = () => {
     setIsGeneratingLeads(true);
@@ -30,7 +26,7 @@ const LeadsTab = ({ patientId }: LeadsTabProps) => {
         "Explorer l'impact du décès du grand-père sur son système de soutien"
       ]);
       setIsGeneratingLeads(false);
-      toast.success("Nouvelles pistes générées");
+      toast.success("Pistes générées avec succès");
     }, 1500);
   };
   
@@ -44,11 +40,9 @@ const LeadsTab = ({ patientId }: LeadsTabProps) => {
           </CardDescription>
         </div>
         <Button
-          variant="outline"
-          size="sm"
-          className="rounded-full"
           onClick={generateNewLeads}
           disabled={isGeneratingLeads}
+          className="rounded-full"
         >
           {isGeneratingLeads ? (
             <>
@@ -58,20 +52,27 @@ const LeadsTab = ({ patientId }: LeadsTabProps) => {
           ) : (
             <>
               <Sparkles size={14} className="mr-2" />
-              Régénérer
+              {therapyLeads.length > 0 ? "Régénérer" : "Générer des pistes"}
             </>
           )}
         </Button>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-2">
-          {therapyLeads.map((lead, index) => (
-            <li key={index} className="flex items-start">
-              <Lightbulb className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-              <span>{lead}</span>
-            </li>
-          ))}
-        </ul>
+        {therapyLeads.length > 0 ? (
+          <ul className="space-y-2">
+            {therapyLeads.map((lead, index) => (
+              <li key={index} className="flex items-start">
+                <Lightbulb className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span>{lead}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <Lightbulb className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+            <p>Aucune piste générée. Cliquez sur le bouton pour générer des suggestions.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

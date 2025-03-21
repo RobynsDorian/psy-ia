@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,9 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, BookOpen, Download, Eye } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { GeneratedStory } from "@/types/patient";
+import { GeneratedStory, PatientSession } from "@/types/patient";
 
 interface StoryTabProps {
   patientId: string;
@@ -29,10 +30,50 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
     morals: "",
     additionalNotes: ""
   });
+  const [sessions, setSessions] = useState<PatientSession[]>([]);
+  const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
+
+  // Fetch sessions data
+  useEffect(() => {
+    // This would normally be an API call
+    // For now, we'll simulate with mock data
+    const mockSessions: PatientSession[] = [
+      {
+        id: "1",
+        patientId,
+        date: new Date("2023-03-15T14:30:00"),
+        transcription: "Première séance avec le patient."
+      },
+      {
+        id: "2",
+        patientId,
+        date: new Date("2023-04-02T10:15:00"),
+        transcription: "Discussion sur les relations familiales."
+      },
+      {
+        id: "3",
+        patientId,
+        date: new Date("2023-05-10T11:00:00"),
+        transcription: "Exploration des problèmes d'anxiété."
+      }
+    ];
+    
+    setSessions(mockSessions);
+  }, [patientId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSessionSelect = (sessionId: string) => {
+    setSelectedSessions(prev => {
+      if (prev.includes(sessionId)) {
+        return prev.filter(id => id !== sessionId);
+      } else {
+        return [...prev, sessionId];
+      }
+    });
   };
 
   const handleCreateStory = () => {
@@ -62,6 +103,7 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
         additionalNotes: ""
       });
       
+      setSelectedSessions([]);
       setIsGenerating(false);
       setIsDialogOpen(false);
       toast.success("Conte thérapeutique généré avec succès");
@@ -204,6 +246,46 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
                 placeholder="Informations additionnelles pour guider la génération"
                 className="min-h-[80px]"
               />
+            </div>
+            
+            <div className="space-y-2 pt-2">
+              <label className="text-sm font-medium">Séances à utiliser comme base</label>
+              <div className="border rounded-md">
+                {sessions.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]">Utiliser</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Aperçu</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sessions.map((session) => (
+                        <TableRow key={session.id}>
+                          <TableCell>
+                            <Checkbox 
+                              checked={selectedSessions.includes(session.id)} 
+                              onCheckedChange={() => handleSessionSelect(session.id)}
+                              id={`session-${session.id}`}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {format(session.date, 'PPP', { locale: fr })}
+                          </TableCell>
+                          <TableCell className="max-w-[250px] truncate">
+                            {session.transcription.substring(0, 50)}...
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">
+                    Aucune séance disponible
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           
