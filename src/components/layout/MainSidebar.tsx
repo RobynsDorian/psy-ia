@@ -1,18 +1,17 @@
-
-import { useLocation, useNavigate } from "react-router-dom";
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarMenu, 
-  SidebarMenuItem, 
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarHeader,
+import {
+  Sidebar,
+  SidebarContent,
   SidebarFooter,
-  SidebarGroup
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
 } from "@/components/ui/sidebar";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Users, Calendar, Sparkles } from "lucide-react";
+import { Calendar, LayoutDashboard, Users } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   children: React.ReactNode;
@@ -23,9 +22,7 @@ export const MainSidebarWrapper = ({ children }: SidebarProps) => {
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full">
         <MainSidebar />
-        <div className="flex flex-1 flex-col">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col">{children}</div>
       </div>
     </SidebarProvider>
   );
@@ -34,32 +31,32 @@ export const MainSidebarWrapper = ({ children }: SidebarProps) => {
 const MainSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const isActive = (path: string) => location.pathname === path;
-  
+
   const menuItems = [
     {
       title: "Tableau de bord",
       path: "/",
-      icon: LayoutDashboard
+      icon: LayoutDashboard,
     },
     {
       title: "Patients",
       path: "/patients",
-      icon: Users
+      icon: Users,
     },
     {
-      title: "Rendez-vous",
+      title: "Rendez-vous (v2)",
       path: "/appointments",
-      icon: Calendar
+      icon: Calendar,
     },
-    {
-      title: "Outils IA",
-      path: "/ai-tools",
-      icon: Sparkles
-    }
+    // {
+    //   title: "Outils IA",
+    //   path: "/ai-tools",
+    //   icon: Sparkles,
+    // },
   ];
-  
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -72,13 +69,13 @@ const MainSidebar = () => {
           <div className="text-xl font-bold text-sonalis-primary">PSY-IA</div>
         </motion.div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
             {menuItems.map((item, index) => (
               <SidebarMenuItem key={item.path}>
-                <SidebarMenuButton 
+                <SidebarMenuButton
                   isActive={isActive(item.path)}
                   onClick={() => navigate(item.path)}
                   tooltip={item.title}
@@ -91,7 +88,7 @@ const MainSidebar = () => {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter>
         <div className="px-4 py-2 text-xs text-muted-foreground">
           © {new Date().getFullYear()} PSY-IA

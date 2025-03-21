@@ -1,11 +1,9 @@
-
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Save, FileText, PenLine } from "lucide-react";
+import { PenLine } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface TranscriptionEditorProps {
   transcription: string;
@@ -13,38 +11,38 @@ interface TranscriptionEditorProps {
   isProcessing: boolean;
 }
 
-const TranscriptionEditor = ({ 
-  transcription, 
-  onSave, 
-  isProcessing 
+const TranscriptionEditor = ({
+  transcription,
+  onSave,
+  isProcessing,
 }: TranscriptionEditorProps) => {
   const [editedText, setEditedText] = useState(transcription);
   const [activeTab, setActiveTab] = useState("edit");
   const [psychNotes, setPsychNotes] = useState("");
-  
+
   useEffect(() => {
     setEditedText(transcription);
   }, [transcription]);
-  
+
   const handleSave = () => {
     onSave(editedText);
     // Save the psych notes as well (in a real application, you would send this to the server)
     toast.success("Transcription et notes sauvegardées");
   };
-  
+
   return (
-    <motion.div 
+    <motion.div
       className="w-full h-full flex flex-col space-y-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <FileText className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-medium">Transcription</h2>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <Button
             variant="outline"
@@ -57,14 +55,18 @@ const TranscriptionEditor = ({
             Sauvegarder
           </Button>
         </div>
-      </div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="self-start mb-4 rounded-xl">
+      </div> */}
+
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex-1 flex flex-col"
+      >
+        {/* <TabsList className="self-start mb-4 rounded-xl">
           <TabsTrigger value="edit" className="rounded-l-xl">Éditer</TabsTrigger>
           <TabsTrigger value="preview" className="rounded-r-xl">Aperçu</TabsTrigger>
-        </TabsList>
-        
+        </TabsList> */}
+
         <TabsContent value="edit" className="flex-1 mt-0">
           <Textarea
             value={editedText}
@@ -73,7 +75,7 @@ const TranscriptionEditor = ({
             placeholder="La transcription apparaîtra ici..."
             disabled={isProcessing}
           />
-          
+
           <div className="mt-4">
             <div className="flex items-center space-x-2 mb-2">
               <PenLine className="w-4 h-4 text-primary" />
@@ -88,12 +90,12 @@ const TranscriptionEditor = ({
             />
           </div>
         </TabsContent>
-        
+
         <TabsContent value="preview" className="flex-1 mt-0">
           <div className="h-[300px] p-4 bg-muted/30 rounded-xl subtle-scroll text-base leading-relaxed whitespace-pre-wrap">
             {editedText || "Aucune transcription à afficher."}
           </div>
-          
+
           {psychNotes && (
             <div className="mt-4">
               <div className="flex items-center space-x-2 mb-2">
