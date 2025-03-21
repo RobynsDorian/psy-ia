@@ -143,125 +143,123 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
       
       <CardContent className="p-0">
         <Tabs defaultValue="list" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-2 rounded-none">
-            <TabsTrigger value="list">Liste</TabsTrigger>
-            <TabsTrigger value="map">Genogramme</TabsTrigger>
+          <TabsList className="w-full rounded-none">
+            <TabsTrigger value="list" className="flex-1">Liste</TabsTrigger>
+            <TabsTrigger value="add" className="flex-1">Ajouter</TabsTrigger>
           </TabsList>
           
           <TabsContent value="list" className="p-6 space-y-4">
-            {activeTab === "list" && (
-              <div className="grid gap-6 md:grid-cols-2">
-                {relationships.length > 0 ? (
-                  relationships.map((relation, index) => (
-                    <motion.div
-                      key={relation.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1, duration: 0.4 }}
-                      className="glass-panel p-4 border rounded-lg"
-                    >
-                      {editingId === relation.id ? (
-                        <div className="space-y-3">
-                          <div className="space-y-2">
-                            <Label htmlFor={`name-${relation.id}`}>Nom</Label>
-                            <Input 
-                              id={`name-${relation.id}`}
-                              value={newRelationship.name || ""}
-                              onChange={(e) => handleInputChange('name', e.target.value)}
-                              placeholder="Nom de la personne"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`relation-${relation.id}`}>Relation</Label>
-                            <Input 
-                              id={`relation-${relation.id}`}
-                              value={newRelationship.relation || ""}
-                              onChange={(e) => handleInputChange('relation', e.target.value)}
-                              placeholder="Type de relation (ex: mère, père, ami)"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`description-${relation.id}`}>Description</Label>
-                            <Textarea 
-                              id={`description-${relation.id}`}
-                              value={newRelationship.description || ""}
-                              onChange={(e) => handleInputChange('description', e.target.value)}
-                              placeholder="Description de la relation"
-                              rows={3}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`connections-${relation.id}`}>Liens (séparés par des virgules)</Label>
-                            <Input 
-                              id={`connections-${relation.id}`}
-                              value={newRelationship.connections?.join(', ') || ""}
-                              onChange={(e) => handleConnectionChange(e.target.value)}
-                              placeholder="Ex: Marie, Jean, etc."
-                            />
-                          </div>
-                          <div className="flex justify-end space-x-2 mt-4">
-                            <Button variant="outline" size="sm" onClick={handleCancelEdit}>
-                              <X className="h-4 w-4 mr-1" /> Annuler
-                            </Button>
-                            <Button size="sm" onClick={handleSaveEdit}>
-                              <Save className="h-4 w-4 mr-1" /> Sauvegarder
-                            </Button>
-                          </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              {relationships.length > 0 ? (
+                relationships.map((relation, index) => (
+                  <motion.div
+                    key={relation.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.4 }}
+                    className="glass-panel p-4 border rounded-lg"
+                  >
+                    {editingId === relation.id ? (
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label htmlFor={`name-${relation.id}`}>Nom</Label>
+                          <Input 
+                            id={`name-${relation.id}`}
+                            value={newRelationship.name || ""}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            placeholder="Nom de la personne"
+                          />
                         </div>
-                      ) : (
-                        <div className="flex items-start space-x-3">
-                          <div className="rounded-full bg-primary/10 p-2 text-primary">
-                            <UserRound className="h-4 w-4" />
+                        <div className="space-y-2">
+                          <Label htmlFor={`relation-${relation.id}`}>Relation</Label>
+                          <Input 
+                            id={`relation-${relation.id}`}
+                            value={newRelationship.relation || ""}
+                            onChange={(e) => handleInputChange('relation', e.target.value)}
+                            placeholder="Type de relation (ex: mère, père, ami)"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`description-${relation.id}`}>Description</Label>
+                          <Textarea 
+                            id={`description-${relation.id}`}
+                            value={newRelationship.description || ""}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
+                            placeholder="Description de la relation"
+                            rows={3}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`connections-${relation.id}`}>Liens (séparés par des virgules)</Label>
+                          <Input 
+                            id={`connections-${relation.id}`}
+                            value={newRelationship.connections?.join(', ') || ""}
+                            onChange={(e) => handleConnectionChange(e.target.value)}
+                            placeholder="Ex: Marie, Jean, etc."
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2 mt-4">
+                          <Button variant="outline" size="sm" onClick={handleCancelEdit}>
+                            <X className="h-4 w-4 mr-1" /> Annuler
+                          </Button>
+                          <Button size="sm" onClick={handleSaveEdit}>
+                            <Save className="h-4 w-4 mr-1" /> Sauvegarder
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start space-x-3">
+                        <div className="rounded-full bg-primary/10 p-2 text-primary">
+                          <UserRound className="h-4 w-4" />
+                        </div>
+                        <div className="space-y-1 flex-1">
+                          <div className="flex justify-between items-start">
+                            <div className="font-medium">{relation.name}</div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0"
+                              onClick={() => handleEdit(relation.id)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <div className="space-y-1 flex-1">
-                            <div className="flex justify-between items-start">
-                              <div className="font-medium">{relation.name}</div>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-8 w-8 p-0"
-                                onClick={() => handleEdit(relation.id)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <div className="text-sm text-muted-foreground flex items-center">
-                              <Heart className="h-3 w-3 mr-1" />
-                              {relation.relation}
-                            </div>
-                            <p className="text-sm mt-2">{relation.description}</p>
-                            
-                            {relation.connections.length > 0 && (
-                              <div className="mt-3">
-                                <div className="text-xs text-muted-foreground mb-1">Liens avec:</div>
-                                <div className="flex flex-wrap gap-1">
-                                  {relation.connections.map((connection, i) => (
-                                    <span 
-                                      key={i} 
-                                      className="text-xs bg-accent/50 text-accent-foreground px-2 py-0.5 rounded-full"
-                                    >
-                                      {connection}
-                                    </span>
-                                  ))}
-                                </div>
+                          <div className="text-sm text-muted-foreground flex items-center">
+                            <Heart className="h-3 w-3 mr-1" />
+                            {relation.relation}
+                          </div>
+                          <p className="text-sm mt-2">{relation.description}</p>
+                          
+                          {relation.connections.length > 0 && (
+                            <div className="mt-3">
+                              <div className="text-xs text-muted-foreground mb-1">Liens avec:</div>
+                              <div className="flex flex-wrap gap-1">
+                                {relation.connections.map((connection, i) => (
+                                  <span 
+                                    key={i} 
+                                    className="text-xs bg-accent/50 text-accent-foreground px-2 py-0.5 rounded-full"
+                                  >
+                                    {connection}
+                                  </span>
+                                ))}
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="col-span-2 text-center p-12 text-muted-foreground">
-                    <p>Aucune relation n'a encore été identifiée.</p>
-                    <Button className="mt-4" onClick={() => setActiveTab("add")}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Ajouter une relation
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+                      </div>
+                    )}
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-2 text-center p-12 text-muted-foreground">
+                  <p>Aucune relation n'a encore été identifiée.</p>
+                  <Button className="mt-4" onClick={() => setActiveTab("add")}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Ajouter une relation
+                  </Button>
+                </div>
+              )}
+            </div>
           </TabsContent>
           
           <TabsContent value="add" className="p-6">
@@ -320,22 +318,6 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="map" className="p-6">
-            <div className="glass-panel p-6 h-80 flex items-center justify-center border rounded-lg">
-              <div className="text-center space-y-4">
-                <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium">Génogramme</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Représentation visuelle des relations familiales et sociales basée sur les données analysées
-                  </p>
-                </div>
-              </div>
-            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
