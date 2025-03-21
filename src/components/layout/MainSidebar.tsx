@@ -69,7 +69,7 @@ const MainSidebar = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.3 }}
         >
-          <div className="text-xl font-bold text-sonalis-primary">PSY-AI</div>
+          <div className="text-xl font-bold text-sonalis-primary">PSY-IA</div>
         </motion.div>
       </SidebarHeader>
       
