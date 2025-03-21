@@ -61,7 +61,7 @@ export interface GeneratedStory {
   type: 'children' | 'adult' | 'therapeutic';
   createdAt: Date;
   baseTemplate?: StoryTemplate;
-  pages: string[];
+  pages: string[];  // Changed from an object with content to a simple string array
 }
 
 export interface StoryFormData {

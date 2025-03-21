@@ -44,13 +44,13 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
         id: Date.now().toString(),
         patientId,
         title: formData.title,
-        type: "therapeutic" as const,
+        type: "therapeutic",
         content: "Il était une fois un petit animal nommé Léo...",
         createdAt: new Date(),
         pages: [
-          { content: "Il était une fois un petit animal nommé Léo. Léo était un jeune renard très intelligent, mais qui avait beaucoup de mal à faire confiance aux autres animaux de la forêt." },
-          { content: "Un jour, alors qu'une tempête menaçait, Léo dut accepter l'aide d'autres animaux pour mettre son terrier à l'abri." },
-          { content: "Grâce à cette expérience, Léo comprit que faire confiance aux autres pouvait parfois être nécessaire et bénéfique." }
+          "Il était une fois un petit animal nommé Léo. Léo était un jeune renard très intelligent, mais qui avait beaucoup de mal à faire confiance aux autres animaux de la forêt.",
+          "Un jour, alors qu'une tempête menaçait, Léo dut accepter l'aide d'autres animaux pour mettre son terrier à l'abri.",
+          "Grâce à cette expérience, Léo comprit que faire confiance aux autres pouvait parfois être nécessaire et bénéfique."
         ]
       };
       
@@ -72,7 +72,7 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
 
   const handleExportStory = (story: GeneratedStory) => {
     // Create a text file with the story content
-    const content = story.pages.map(page => page.content).join("\n\n");
+    const content = story.pages.join("\n\n");
     const element = document.createElement("a");
     const file = new Blob([content], { type: "text/plain;charset=utf-8" });
     element.href = URL.createObjectURL(file);
@@ -238,7 +238,7 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
           
           <div className="space-y-4">
             <div className="bg-muted/30 p-6 rounded-lg">
-              {selectedStory?.pages && selectedStory.pages[currentPage]?.content}
+              {selectedStory?.pages && selectedStory.pages[currentPage]}
             </div>
             
             <div className="flex justify-between items-center">
