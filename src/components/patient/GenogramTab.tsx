@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Users, FileDown, FileText, History, RotateCcw, Pen, Save } from "lucide-react";
+import { Users, FileDown, FileText, History, RotateCcw, Pen, Save, Network } from "lucide-react";
 import { PatientRelationship, GenogramVersion } from "@/types/patient";
 
 // Sample genogram versions
@@ -90,7 +90,7 @@ const GenogramTab = ({ patientId, onSwitchToRelationsTab }: GenogramTabProps) =>
       <CardHeader className="bg-secondary/50 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Users className="h-5 w-5 text-primary" />
+            <Network className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg font-medium">Génogramme du patient</CardTitle>
           </div>
           <div className="flex items-center space-x-2">
@@ -213,7 +213,7 @@ const GenogramTab = ({ patientId, onSwitchToRelationsTab }: GenogramTabProps) =>
           ) : (
             <div className="text-center space-y-4">
               <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-primary" />
+                <Network className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="text-lg font-medium">Génogramme</h3>

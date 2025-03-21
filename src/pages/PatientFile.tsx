@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, ClipboardList, Calendar, FileText, Users, BookOpen, Sparkles, NetworkChart } from "lucide-react";
+import { ArrowLeft, ClipboardList, Calendar, FileText, Users, BookOpen, Sparkles, Network } from "lucide-react";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -256,7 +257,7 @@ const PatientFile = () => {
               Relations
             </TabsTrigger>
             <TabsTrigger value="genogram" className="custom-tab-trigger">
-              <NetworkChart className="h-4 w-4 mr-2" />
+              <Network className="h-4 w-4 mr-2" />
               Génogramme
             </TabsTrigger>
             <TabsTrigger value="stories" className="custom-tab-trigger">
