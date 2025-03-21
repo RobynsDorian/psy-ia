@@ -77,7 +77,7 @@ const SessionDialog = ({ session, open, onClose }: SessionDialogProps) => {
 
               {session.analysis && (
                 <div>
-                  <h3 className="text-sm font-medium mb-2">Analyse</h3>
+                  <h3 className="text-sm font-medium mb-2">Notes additionnelles</h3>
                   <div className="bg-muted/30 rounded-lg p-4">
                     <p className="text-sm">{session.analysis}</p>
                   </div>
@@ -100,9 +100,21 @@ const SessionDialog = ({ session, open, onClose }: SessionDialogProps) => {
 
               <div>
                 <h3 className="text-sm font-medium mb-2">Transcription textuelle</h3>
-                <ScrollArea className="h-[300px]">
+                <ScrollArea className="h-[400px]">
                   <div className="bg-muted/30 rounded-lg p-4">
-                    <p className="text-sm whitespace-pre-wrap">{session.transcription || "Aucune transcription disponible."}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {session.transcription || 
+                      `Aucune transcription disponible pour cette séance.
+                      
+La transcription de la conversation entre le thérapeute et le patient serait affichée ici dans un format dialogué, permettant de suivre l'évolution de l'échange et les points clés abordés durant la séance.
+
+Exemple:
+Patient: Je ne sais pas, c'est compliqué avec ma mère en ce moment. Nous nous disputons beaucoup.
+        
+Thérapeute: Pouvez-vous me parler davantage de votre relation avec votre mère?
+
+Patient: Eh bien, elle a toujours été très exigeante. Mon père est plus détendu, mais il n'intervient jamais quand elle et moi nous disputons...`}
+                    </p>
                   </div>
                 </ScrollArea>
               </div>

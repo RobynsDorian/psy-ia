@@ -1,215 +1,261 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X, Plus, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Minus, Wand2, Edit2, Check } from "lucide-react";
+import { toast } from "sonner";
 
 interface SessionSummaryFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (formData: any) => void;
   isLoading: boolean;
 }
 
-const summarySchema = z.object({
-  summaryType: z.enum(["classic", "custom"]),
-  customAxes: z.array(z.object({
-    name: z.string().min(1, "L'axe ne peut pas être vide"),
-    description: z.string().optional()
-  })).optional(),
-  additionalNotes: z.string().optional()
-});
-
-type SummaryFormValues = z.infer<typeof summarySchema>;
+interface CustomAxis {
+  id: string;
+  name: string;
+}
 
 const SessionSummaryForm = ({ open, onClose, onSubmit, isLoading }: SessionSummaryFormProps) => {
-  const [customAxes, setCustomAxes] = useState<Array<{ name: string; description: string }>>([]);
-
-  const form = useForm<SummaryFormValues>({
-    resolver: zodResolver(summarySchema),
-    defaultValues: {
-      summaryType: "classic",
-      customAxes: [],
-      additionalNotes: ""
-    }
-  });
-
-  const summaryType = form.watch("summaryType");
-
-  const handleSubmit = (values: SummaryFormValues) => {
-    if (values.summaryType === "custom") {
-      values.customAxes = customAxes;
-    }
-    onSubmit(values);
-  };
+  const [activeTab, setActiveTab] = useState<"form" | "preview">("form");
+  const [summaryType, setSummaryType] = useState("standard");
+  const [customAxes, setCustomAxes] = useState<CustomAxis[]>([
+    { id: "1", name: "Traumatisme" }
+  ]);
+  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [generatedSummary, setGeneratedSummary] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedSummary, setEditedSummary] = useState("");
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
   const addCustomAxis = () => {
-    setCustomAxes([...customAxes, { name: "", description: "" }]);
+    setCustomAxes([...customAxes, { id: Date.now().toString(), name: "" }]);
   };
 
-  const removeCustomAxis = (index: number) => {
-    setCustomAxes(customAxes.filter((_, i) => i !== index));
+  const removeCustomAxis = (id: string) => {
+    setCustomAxes(customAxes.filter(axis => axis.id !== id));
   };
 
-  const updateCustomAxis = (index: number, field: 'name' | 'description', value: string) => {
-    const updatedAxes = [...customAxes];
-    updatedAxes[index][field] = value;
-    setCustomAxes(updatedAxes);
+  const updateCustomAxisName = (id: string, name: string) => {
+    setCustomAxes(
+      customAxes.map(axis => (axis.id === id ? { ...axis, name } : axis))
+    );
+  };
+
+  const handleGeneratePreview = () => {
+    setIsGeneratingPreview(true);
+    
+    // Simulate API call for generating summary preview
+    setTimeout(() => {
+      const sampleSummary = `Résumé de la séance généré sur base des données fournies:
+
+Le patient a exprimé des inquiétudes concernant sa relation avec sa mère, qu'il décrit comme exigeante et critique. Il se sent constamment comparé à sa sœur Julie, qui semble recevoir un traitement préférentiel. 
+
+${summaryType === "custom" ? "Axes spécifiques analysés:\n" + customAxes.map(a => `- ${a.name}: Le patient montre des signes de difficulté dans ce domaine`).join("\n") : ""}
+
+Cette dynamique familiale a créé un sentiment profond d'insuffisance chez le patient. Le décès récent de son grand-père paternel, qui représentait une figure de soutien importante, a exacerbé ses difficultés.`;
+      
+      setGeneratedSummary(sampleSummary);
+      setEditedSummary(sampleSummary);
+      setIsGeneratingPreview(false);
+      setActiveTab("preview");
+    }, 1500);
+  };
+
+  const handleSubmit = () => {
+    onSubmit({
+      summaryType,
+      customAxes,
+      additionalNotes,
+      summary: isEditing ? editedSummary : generatedSummary
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Générer un résumé de séance</DialogTitle>
           <DialogDescription>
-            Choisissez comment vous souhaitez résumer cette séance
+            Personnalisez les paramètres de génération du résumé de la séance
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="summaryType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Type de résumé</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="classic" id="classic" />
-                        <Label htmlFor="classic">Résumé classique (synthèse générale de la séance)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="custom" id="custom" />
-                        <Label htmlFor="custom">Résumé personnalisé (avec axes spécifiques)</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormDescription>
-                    Choisissez le type de résumé que vous souhaitez générer
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "form" | "preview")} className="mt-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="form">Configuration</TabsTrigger>
+            <TabsTrigger value="preview" disabled={!generatedSummary && !isGeneratingPreview}>
+              Prévisualisation
+            </TabsTrigger>
+          </TabsList>
 
-            {summaryType === "custom" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label>Axes de résumé personnalisés</Label>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={addCustomAxis}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Ajouter un axe
-                  </Button>
-                </div>
-
-                <div className="space-y-4">
-                  {customAxes.length === 0 && (
+          <TabsContent value="form" className="space-y-4 pt-4">
+            <div className="space-y-4">
+              <RadioGroup
+                value={summaryType}
+                onValueChange={setSummaryType}
+                className="space-y-3"
+              >
+                <div className="flex items-start space-x-2 p-2 rounded-md border border-input">
+                  <RadioGroupItem value="standard" id="standard" className="mt-1" />
+                  <div className="grid gap-1.5 leading-none">
+                    <Label htmlFor="standard" className="font-medium">
+                      Résumé standard
+                    </Label>
                     <p className="text-sm text-muted-foreground">
-                      Ajoutez des axes pour personnaliser votre résumé (ex: traumatismes, relations, cognitions...)
+                      Génère un résumé général de la séance basé sur les thèmes principaux abordés
                     </p>
-                  )}
-
-                  {customAxes.map((axis, index) => (
-                    <div key={index} className="border rounded-md p-4 relative">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 h-8 w-8 p-0"
-                        onClick={() => removeCustomAxis(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-
-                      <div className="space-y-3">
-                        <div className="grid gap-2">
-                          <Label htmlFor={`axis-${index}`}>Titre de l'axe</Label>
-                          <Input
-                            id={`axis-${index}`}
-                            value={axis.name}
-                            onChange={(e) => updateCustomAxis(index, 'name', e.target.value)}
-                            placeholder="Ex: Analyse des traumatismes"
-                          />
-                        </div>
-
-                        <div className="grid gap-2">
-                          <Label htmlFor={`description-${index}`}>Description (optionnel)</Label>
-                          <Textarea
-                            id={`description-${index}`}
-                            value={axis.description}
-                            onChange={(e) => updateCustomAxis(index, 'description', e.target.value)}
-                            placeholder="Ex: Se concentrer sur les événements traumatiques mentionnés pendant la séance"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  </div>
                 </div>
+
+                <div className="flex items-start space-x-2 p-2 rounded-md border border-input">
+                  <RadioGroupItem value="custom" id="custom" className="mt-1" />
+                  <div className="grid gap-1.5 leading-none w-full">
+                    <Label htmlFor="custom" className="font-medium">
+                      Résumé personnalisé
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Spécifiez des axes spécifiques à analyser pendant la génération
+                    </p>
+
+                    {summaryType === "custom" && (
+                      <div className="space-y-3 mt-2">
+                        {customAxes.map((axis) => (
+                          <div key={axis.id} className="flex items-center space-x-2">
+                            <Input
+                              value={axis.name}
+                              onChange={(e) => updateCustomAxisName(axis.id, e.target.value)}
+                              placeholder="Nom de l'axe (ex: Trauma, Relation...)"
+                              className="flex-grow"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeCustomAxis(axis.id)}
+                              disabled={customAxes.length <= 1}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addCustomAxis}
+                          className="mt-2"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Ajouter un axe
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </RadioGroup>
+
+              <div className="space-y-2">
+                <Label htmlFor="additionalNotes">Notes additionnelles</Label>
+                <Textarea
+                  id="additionalNotes"
+                  value={additionalNotes}
+                  onChange={(e) => setAdditionalNotes(e.target.value)}
+                  placeholder="Informations supplémentaires pour guider la génération du résumé"
+                  className="min-h-[100px]"
+                />
               </div>
-            )}
+            </div>
 
-            <FormField
-              control={form.control}
-              name="additionalNotes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Informations importantes (optionnel)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Ajoutez des notes ou informations qui doivent être prises en compte dans le résumé"
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={onClose}
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                onClick={handleGeneratePreview}
+                disabled={summaryType === "custom" && customAxes.some(a => !a.name) || isGeneratingPreview}
               >
-                Annuler
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isLoading}
-              >
-                {isLoading ? (
+                {isGeneratingPreview ? (
                   <>
                     <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                    Génération...
+                    Génération en cours...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Générer le résumé
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Générer un aperçu
                   </>
                 )}
               </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="preview" className="space-y-4 pt-4">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Résumé généré</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsEditing(!isEditing);
+                    if (isEditing) {
+                      setGeneratedSummary(editedSummary);
+                      toast.success("Modifications appliquées");
+                    }
+                  }}
+                >
+                  {isEditing ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" />
+                      Appliquer
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 className="h-4 w-4 mr-1" />
+                      Modifier
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {isEditing ? (
+                <Textarea
+                  value={editedSummary}
+                  onChange={(e) => setEditedSummary(e.target.value)}
+                  className="min-h-[300px] font-mono text-sm"
+                />
+              ) : (
+                <div className="bg-muted/30 rounded-lg p-4 min-h-[300px] whitespace-pre-wrap">
+                  {generatedSummary}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <DialogFooter className="mt-6">
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading || !generatedSummary}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                Traitement...
+              </>
+            ) : (
+              "Sauvegarder l'analyse"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

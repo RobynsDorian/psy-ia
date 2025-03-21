@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, ClipboardList, Calendar, FileText, Users } from "lucide-react";
+import { ArrowLeft, ClipboardList, Calendar, FileText, Users, BookOpen, Sparkles } from "lucide-react";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +12,7 @@ import InformationTab from "@/components/patient/InformationTab";
 import SessionsTab from "@/components/patient/SessionsTab";
 import RelationsTab from "@/components/patient/RelationsTab";
 import StoryTab from "@/components/patient/StoryTab";
+import LeadsTab from "@/components/patient/LeadsTab";
 
 const initialPatients: Patient[] = [
   {
@@ -122,6 +122,22 @@ const PatientFile = () => {
   const [histories, setHistories] = useState<GeneratedBackground[]>([]);
   const [stories, setStories] = useState<GeneratedStory[]>([]);
   
+  const sampleStories: GeneratedStory[] = [
+    {
+      id: "1",
+      patientId: "1",
+      title: "Léo et la confiance",
+      content: "Histoire sur la confiance en soi",
+      type: "therapeutic",
+      createdAt: new Date("2023-04-15"),
+      pages: [
+        "Il était une fois un petit animal nommé Léo. Léo était un jeune renard très intelligent, mais qui avait beaucoup de mal à faire confiance aux autres animaux de la forêt.",
+        "Un jour, alors qu'une tempête menaçait, Léo dut accepter l'aide d'autres animaux pour mettre son terrier à l'abri.",
+        "Grâce à cette expérience, Léo comprit que faire confiance aux autres pouvait parfois être nécessaire et bénéfique."
+      ]
+    }
+  ];
+  
   useEffect(() => {
     if (id) {
       const foundPatient = initialPatients.find(p => p.id === id);
@@ -135,9 +151,11 @@ const PatientFile = () => {
         if (id === "1") {
           setRelationships(initialRelationships);
           setHistories(initialHistories);
+          setStories(sampleStories);
         } else {
           setRelationships([]);
           setHistories([]);
+          setStories([]);
         }
         
         if (initialHistories.length > 0 && id === "1") {
@@ -219,7 +237,7 @@ const PatientFile = () => {
         </div>
         
         <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-3 rounded-xl bg-muted/50 custom-tabs-list">
+          <TabsList className="grid w-full max-w-md grid-cols-5 rounded-xl bg-muted/50 custom-tabs-list">
             <TabsTrigger value="info" className="custom-tab-trigger">
               <ClipboardList className="h-4 w-4 mr-2" />
               Informations
@@ -231,6 +249,14 @@ const PatientFile = () => {
             <TabsTrigger value="relations" className="custom-tab-trigger">
               <Users className="h-4 w-4 mr-2" />
               Relations
+            </TabsTrigger>
+            <TabsTrigger value="stories" className="custom-tab-trigger">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Contes
+            </TabsTrigger>
+            <TabsTrigger value="leads" className="custom-tab-trigger">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Pistes
             </TabsTrigger>
           </TabsList>
           
@@ -255,6 +281,17 @@ const PatientFile = () => {
               onAddRelationship={handleAddRelationship}
               onUpdateRelationship={handleUpdateRelationship}
             />
+          </TabsContent>
+          
+          <TabsContent value="stories" className="custom-tab-content">
+            <StoryTab
+              patientId={patient.id}
+              stories={stories}
+            />
+          </TabsContent>
+          
+          <TabsContent value="leads" className="custom-tab-content">
+            <LeadsTab patientId={patient.id} />
           </TabsContent>
         </Tabs>
       </motion.main>
