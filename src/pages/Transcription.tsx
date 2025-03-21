@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import Header from "@/components/layout/Header";
@@ -13,7 +12,6 @@ const Transcription = () => {
   
   const handleAudioCaptured = (blob: Blob) => {
     setAudioBlob(blob);
-    // Simulez une transcription vide au début
     setTranscription("");
   };
   
@@ -26,9 +24,7 @@ const Transcription = () => {
     setIsProcessing(true);
     
     try {
-      // Simulez l'appel API de transcription
       setTimeout(() => {
-        // Exemple de texte de transcription
         const sampleTranscription = `Patient: Je ne sais pas, c'est compliqué avec ma mère en ce moment. Nous nous disputons beaucoup.
         
 Thérapeute: Pouvez-vous me parler davantage de votre relation avec votre mère?
@@ -56,13 +52,6 @@ Patient: Oui, il l'était. Il m'a beaucoup appris, notamment sur la musique. C'e
   
   const handleSaveTranscription = (text: string) => {
     setTranscription(text);
-  };
-  
-  const handleAnalyze = () => {
-    // Sauvegardez d'abord la transcription dans le local storage
-    localStorage.setItem("transcription", transcription);
-    // Redirigez vers la page d'analyse
-    window.location.href = "/analysis";
   };
   
   return (
@@ -119,7 +108,6 @@ Patient: Oui, il l'était. Il m'a beaucoup appris, notamment sur la musique. C'e
             <TranscriptionEditor 
               transcription={transcription}
               onSave={handleSaveTranscription}
-              onAnalyze={handleAnalyze}
               isProcessing={isProcessing}
             />
           </motion.div>
