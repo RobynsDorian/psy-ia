@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, BookOpen, Download, Eye } from "lucide-react";
+import { Plus, BookOpen, Download, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
@@ -59,6 +59,8 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
     ];
     
     setSessions(mockSessions);
+    // Set all sessions selected by default
+    setSelectedSessions(mockSessions.map(session => session.id));
   }, [patientId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -77,6 +79,11 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
   };
 
   const handleCreateStory = () => {
+    if (!formData.title) {
+      toast.error("Le titre est requis");
+      return;
+    }
+    
     setIsGenerating(true);
     
     // Simulate API call
@@ -295,7 +302,7 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
             </Button>
             <Button 
               onClick={handleCreateStory} 
-              disabled={!formData.title || !formData.objectives || isGenerating}
+              disabled={!formData.title || isGenerating}
             >
               {isGenerating ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -310,43 +317,64 @@ const StoryTab = ({ patientId, stories = [] }: StoryTabProps) => {
 
       {/* Dialog pour voir un conte */}
       <Dialog open={isViewingStory} onOpenChange={setIsViewingStory}>
-        <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-y-auto p-0">
+          <DialogHeader className="p-6 pb-0">
             <DialogTitle>{selectedStory?.title}</DialogTitle>
             <DialogDescription>
               Conte thérapeutique généré le {selectedStory && format(selectedStory.createdAt, 'PPP', { locale: fr })}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4">
-            <div className="bg-muted/30 p-6 rounded-lg">
-              {selectedStory?.pages && selectedStory.pages[currentPage]}
+          <div className="p-6 space-y-4">
+            <div className="relative">
+              <div className="bg-muted/20 border rounded-lg p-8 min-h-[300px] flex items-center shadow-md">
+                <div className="absolute left-0 inset-y-0 w-8 bg-gradient-to-r from-background/80 to-transparent z-10" />
+                <div className="absolute right-0 inset-y-0 w-8 bg-gradient-to-l from-background/80 to-transparent z-10" />
+                
+                {/* Book content */}
+                <div className="relative w-full flex justify-center">
+                  <div className="max-w-md mx-auto prose">
+                    {selectedStory?.pages && selectedStory.pages[currentPage]}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Page navigation */}
+              <div className="absolute left-2 inset-y-0 flex items-center">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full bg-background/80 shadow-sm"
+                  disabled={currentPage === 0}
+                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+              </div>
+              
+              <div className="absolute right-2 inset-y-0 flex items-center">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full bg-background/80 shadow-sm"
+                  disabled={!selectedStory?.pages || currentPage >= selectedStory.pages.length - 1}
+                  onClick={() => setCurrentPage(prev => 
+                    selectedStory?.pages ? Math.min(selectedStory.pages.length - 1, prev + 1) : prev
+                  )}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
             
-            <div className="flex justify-between items-center">
-              <Button 
-                variant="outline" 
-                disabled={currentPage === 0} 
-                onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-              >
-                Page précédente
-              </Button>
-              <span className="text-sm text-muted-foreground">
+            <div className="flex justify-center">
+              <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
                 Page {currentPage + 1} sur {selectedStory?.pages?.length || 1}
               </span>
-              <Button 
-                variant="outline" 
-                disabled={!selectedStory?.pages || currentPage >= selectedStory.pages.length - 1} 
-                onClick={() => setCurrentPage(prev => 
-                  selectedStory?.pages ? Math.min(selectedStory.pages.length - 1, prev + 1) : prev
-                )}
-              >
-                Page suivante
-              </Button>
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="p-6 pt-0">
             <Button variant="outline" onClick={() => setIsViewingStory(false)}>
               Fermer
             </Button>

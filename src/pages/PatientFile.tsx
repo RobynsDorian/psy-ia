@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, ClipboardList, Calendar, FileText, Users, BookOpen, Sparkles } from "lucide-react";
+import { ArrowLeft, ClipboardList, Calendar, FileText, Users, BookOpen, Sparkles, NetworkChart } from "lucide-react";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +13,7 @@ import SessionsTab from "@/components/patient/SessionsTab";
 import RelationsTab from "@/components/patient/RelationsTab";
 import StoryTab from "@/components/patient/StoryTab";
 import LeadsTab from "@/components/patient/LeadsTab";
+import GenogramTab from "@/components/patient/GenogramTab";
 
 const initialPatients: Patient[] = [
   {
@@ -187,6 +188,10 @@ const PatientFile = () => {
     );
   };
   
+  const handleSwitchToRelationsTab = () => {
+    setActiveTab("relations");
+  };
+  
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('fr-FR', { 
       day: '2-digit', 
@@ -237,7 +242,7 @@ const PatientFile = () => {
         </div>
         
         <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-5 rounded-xl bg-muted/50 custom-tabs-list">
+          <TabsList className="grid w-full max-w-md grid-cols-6 rounded-xl bg-muted/50 custom-tabs-list">
             <TabsTrigger value="info" className="custom-tab-trigger">
               <ClipboardList className="h-4 w-4 mr-2" />
               Informations
@@ -249,6 +254,10 @@ const PatientFile = () => {
             <TabsTrigger value="relations" className="custom-tab-trigger">
               <Users className="h-4 w-4 mr-2" />
               Relations
+            </TabsTrigger>
+            <TabsTrigger value="genogram" className="custom-tab-trigger">
+              <NetworkChart className="h-4 w-4 mr-2" />
+              Génogramme
             </TabsTrigger>
             <TabsTrigger value="stories" className="custom-tab-trigger">
               <BookOpen className="h-4 w-4 mr-2" />
@@ -280,6 +289,13 @@ const PatientFile = () => {
               relationships={relationships}
               onAddRelationship={handleAddRelationship}
               onUpdateRelationship={handleUpdateRelationship}
+            />
+          </TabsContent>
+          
+          <TabsContent value="genogram" className="custom-tab-content">
+            <GenogramTab
+              patientId={patient.id}
+              onSwitchToRelationsTab={handleSwitchToRelationsTab}
             />
           </TabsContent>
           
