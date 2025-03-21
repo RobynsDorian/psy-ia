@@ -5,19 +5,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Save, Play, FileText, Wand2, PenLine } from "lucide-react";
+import { Save, FileText, PenLine } from "lucide-react";
 
 interface TranscriptionEditorProps {
   transcription: string;
   onSave: (text: string) => void;
-  onAnalyze: () => void;
   isProcessing: boolean;
 }
 
 const TranscriptionEditor = ({ 
   transcription, 
   onSave, 
-  onAnalyze,
   isProcessing 
 }: TranscriptionEditorProps) => {
   const [editedText, setEditedText] = useState(transcription);
@@ -32,10 +30,6 @@ const TranscriptionEditor = ({
     onSave(editedText);
     // Save the psych notes as well (in a real application, you would send this to the server)
     toast.success("Transcription et notes sauvegardées");
-  };
-  
-  const handleAnalyze = () => {
-    onAnalyze();
   };
   
   return (
@@ -61,25 +55,6 @@ const TranscriptionEditor = ({
           >
             <Save className="w-4 h-4 mr-2" />
             Sauvegarder
-          </Button>
-          
-          <Button
-            size="sm"
-            className="rounded-xl"
-            onClick={handleAnalyze}
-            disabled={isProcessing || !editedText.trim()}
-          >
-            {isProcessing ? (
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-                <span>Analyse en cours...</span>
-              </div>
-            ) : (
-              <>
-                <Wand2 className="w-4 h-4 mr-2" />
-                Analyser
-              </>
-            )}
           </Button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -11,7 +12,7 @@ import { Patient, BackgroundSection, GeneratedBackground, PatientSession, Patien
 import InformationTab from "@/components/patient/InformationTab";
 import SessionsTab from "@/components/patient/SessionsTab";
 import RelationsTab from "@/components/patient/RelationsTab";
-import HistoryTab from "@/components/patient/HistoryTab";
+import StoryTab from "@/components/patient/StoryTab";
 
 const initialPatients: Patient[] = [
   {
@@ -156,48 +157,6 @@ const PatientFile = () => {
     toast.success("Patient mis à jour");
   };
   
-  const generatePatientBackground = () => {
-    if (!patient) return;
-    
-    setIsGeneratingBackground(true);
-    
-    setTimeout(() => {
-      const sampleBackground: GeneratedBackground = {
-        id: Date.now().toString(),
-        title: "Analyse du " + new Date().toLocaleDateString(),
-        createdAt: new Date(),
-        summary: `${patient.firstName} ${patient.lastName} a grandi dans un foyer où les attentes parentales étaient élevées, particulièrement de la part de sa mère. Cette dynamique familiale a créé un sentiment constant de pression et d'insuffisance. La relation avec son père, bien que moins conflictuelle, est marquée par une certaine passivité. ${patient.firstName} a également une sœur nommée Julie qui semble bénéficier d'un traitement préférentiel de la part de la mère, ce qui a généré des sentiments de jalousie et d'injustice. Le grand-père paternel a joué un rôle de soutien émotionnel important, mais son décès récent a laissé un vide significatif.`,
-        sections: [
-          {
-            title: "Enfance",
-            content: `${patient.firstName} a grandi dans un environnement familial exigeant où les attentes parentales, surtout maternelles, étaient très élevées. Cette période a façonné sa perception de soi et son estime personnelle.`,
-            icon: "home"
-          },
-          {
-            title: "Relations familiales",
-            content: `Relations tendues avec sa mère, plus distantes mais moins conflictuelles avec son père. Rivalité avec sa sœur Julie qui semble être la "préférée". Le grand-père paternel était une figure de soutien important.`,
-            icon: "heart"
-          },
-          {
-            title: "Événements marquants",
-            content: `Le décès du grand-père paternel l'année dernière a été particulièrement difficile, privant ${patient.firstName} d'une source importante de validation et de soutien émotionnel.`,
-            icon: "calendar"
-          },
-          {
-            title: "Parcours personnel",
-            content: `${patient.firstName} semble lutter pour trouver sa place et obtenir une reconnaissance, particulièrement au sein de sa famille. Ces difficultés relationnelles pourraient avoir un impact sur d'autres aspects de sa vie comme ses relations sociales ou professionnelles.`,
-            icon: "graduation"
-          }
-        ]
-      };
-      
-      setGeneratedBackground(sampleBackground);
-      setHistories(prev => [sampleBackground, ...prev]);
-      setIsGeneratingBackground(false);
-      toast.success("Historique généré avec succès");
-    }, 3000);
-  };
-  
   const handleAddRelationship = (relationship: PatientRelationship) => {
     setRelationships(prev => [relationship, ...prev]);
   };
@@ -245,7 +204,7 @@ const PatientFile = () => {
           <Button 
             variant="outline" 
             size="icon"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/patients")}
             className="rounded-full"
           >
             <ArrowLeft size={18} />
@@ -259,38 +218,8 @@ const PatientFile = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-sm font-medium text-muted-foreground mb-1">Code patient</div>
-              <p className="text-2xl font-bold">{patient.code}</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-sm font-medium text-muted-foreground mb-1">Suivi depuis</div>
-              <p className="text-2xl font-bold">{formatDate(patient.createdAt).split(" ")[0]}</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-sm font-medium text-muted-foreground mb-1">Dernière mise à jour</div>
-              <p className="text-2xl font-bold">{formatDate(patient.updatedAt).split(" ")[0]}</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-sm font-medium text-muted-foreground mb-1">Âge</div>
-              <p className="text-2xl font-bold">{patient.age} ans</p>
-            </CardContent>
-          </Card>
-        </div>
-        
         <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-4 rounded-xl bg-muted/50 custom-tabs-list">
+          <TabsList className="grid w-full max-w-md grid-cols-3 rounded-xl bg-muted/50 custom-tabs-list">
             <TabsTrigger value="info" className="custom-tab-trigger">
               <ClipboardList className="h-4 w-4 mr-2" />
               Informations
@@ -302,10 +231,6 @@ const PatientFile = () => {
             <TabsTrigger value="relations" className="custom-tab-trigger">
               <Users className="h-4 w-4 mr-2" />
               Relations
-            </TabsTrigger>
-            <TabsTrigger value="history" className="custom-tab-trigger">
-              <FileText className="h-4 w-4 mr-2" />
-              Contes
             </TabsTrigger>
           </TabsList>
           
@@ -329,15 +254,6 @@ const PatientFile = () => {
               relationships={relationships}
               onAddRelationship={handleAddRelationship}
               onUpdateRelationship={handleUpdateRelationship}
-            />
-          </TabsContent>
-          
-          <TabsContent value="history" className="custom-tab-content">
-            <HistoryTab
-              patientId={patient.id}
-              histories={histories}
-              isGeneratingBackground={isGeneratingBackground}
-              generatePatientBackground={generatePatientBackground}
             />
           </TabsContent>
         </Tabs>
