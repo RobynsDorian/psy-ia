@@ -43,6 +43,12 @@ const SessionsTab = ({ patientId, patientCode, sessions }: SessionsTabProps) => 
     toast.success("Transcription sauvegardée");
   };
   
+  const resetSessionForm = () => {
+    setAudioBlob(null);
+    setTranscription("");
+    setActiveTab("list");
+  };
+  
   const transcribeAudio = async () => {
     if (!audioBlob) {
       toast.error("Aucun audio à transcrire");
@@ -96,9 +102,9 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
     
     setPastSessions(prev => [newSession, ...prev]);
     toast.success("Séance sauvegardée avec succès");
-    setAudioBlob(null);
-    setTranscription("");
-    setActiveTab("list");
+    
+    // Reset the form after saving
+    resetSessionForm();
   };
   
   const handleSaveAndSummarize = () => {
@@ -140,6 +146,9 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
         setIsGeneratingSummary(false);
         setIsSummaryFormOpen(false);
         toast.success("Analyse générée avec succès");
+        
+        // Reset the form after processing
+        resetSessionForm();
       }
     }, 3000);
   };
@@ -323,7 +332,13 @@ Patient: Frustré, principalement. Et triste aussi. J'ai l'impression que rien d
       {/* Formulaire pour générer le résumé */}
       <SessionSummaryForm
         open={isSummaryFormOpen}
-        onClose={() => setIsSummaryFormOpen(false)}
+        onClose={() => {
+          setIsSummaryFormOpen(false);
+          if (selectedSession && !selectedSession.analysis) {
+            // Only reset form if we cancelled without analyzing
+            resetSessionForm();
+          }
+        }}
         onSubmit={handleGenerateSummary}
         isLoading={isGeneratingSummary}
       />

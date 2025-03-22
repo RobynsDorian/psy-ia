@@ -3,18 +3,26 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserRound, Heart, Users, FileDown, Plus, Edit, Save, X } from "lucide-react";
+import { UserRound, Heart, Users, FileDown, Plus, Edit, Save, X, Wand2, History, RotateCcw } from "lucide-react";
 import { PatientRelationship } from "@/types/patient";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface RelationsTabProps {
   relationships: PatientRelationship[];
   onAddRelationship: (relationship: PatientRelationship) => void;
   onUpdateRelationship: (id: string, relationship: Partial<PatientRelationship>) => void;
+}
+
+interface RelationVersionHistory {
+  id: string;
+  date: Date;
+  relationships: PatientRelationship[];
+  notes?: string;
 }
 
 const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }: RelationsTabProps) => {
@@ -26,6 +34,16 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
     description: "",
     connections: []
   });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [relationVersions, setRelationVersions] = useState<RelationVersionHistory[]>([
+    {
+      id: "1",
+      date: new Date(new Date().setDate(new Date().getDate() - 15)),
+      relationships: [...relationships],
+      notes: "Version initiale des relations"
+    }
+  ]);
   
   const handleEdit = (id: string) => {
     setEditingId(id);
@@ -57,6 +75,15 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
         connections: []
       });
       toast.success("Relation mise à jour");
+      
+      // Save a new version in history
+      const newVersion: RelationVersionHistory = {
+        id: Date.now().toString(),
+        date: new Date(),
+        relationships: [...relationships],
+        notes: "Modification manuelle d'une relation"
+      };
+      setRelationVersions([...relationVersions, newVersion]);
     } else {
       toast.error("Veuillez remplir tous les champs obligatoires");
     }
@@ -80,6 +107,21 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
       });
       setActiveTab("list");
       toast.success("Nouvelle relation ajoutée");
+      
+      // Save a new version in history
+      const newVersion: RelationVersionHistory = {
+        id: Date.now().toString(),
+        date: new Date(),
+        relationships: [...relationships, {
+          id: Date.now().toString(),
+          name: newRelationship.name || "",
+          relation: newRelationship.relation || "",
+          description: newRelationship.description || "",
+          connections: Array.isArray(connection) ? connection : []
+        }],
+        notes: "Ajout manuel d'une relation"
+      };
+      setRelationVersions([...relationVersions, newVersion]);
     } else {
       toast.error("Veuillez remplir tous les champs obligatoires");
     }
@@ -106,6 +148,69 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
     }));
   };
   
+  const handleGenerateRelations = () => {
+    setIsGenerating(true);
+    
+    // Mock AI-generated relationships
+    setTimeout(() => {
+      const aiGeneratedRelations: PatientRelationship[] = [
+        {
+          id: Date.now().toString(),
+          name: "Sophie Dupont",
+          relation: "Mère",
+          description: "Relation conflictuelle marquée par des attentes élevées. Source d'anxiété pour le patient.",
+          connections: ["Thomas Dupont", "Emma Dupont"]
+        },
+        {
+          id: (Date.now() + 1).toString(),
+          name: "Thomas Dupont",
+          relation: "Père",
+          description: "Relation distante. Peu impliqué dans l'éducation, tendance à éviter les conflits familiaux.",
+          connections: ["Sophie Dupont", "Emma Dupont"]
+        },
+        {
+          id: (Date.now() + 2).toString(),
+          name: "Emma Dupont",
+          relation: "Sœur cadette",
+          description: "Relation teintée de jalousie, le patient perçoit qu'elle reçoit plus d'attention parentale.",
+          connections: ["Sophie Dupont", "Thomas Dupont"]
+        },
+        {
+          id: (Date.now() + 3).toString(),
+          name: "Marie Leclerc",
+          relation: "Grand-mère maternelle",
+          description: "Relation positive et soutenante, figure d'attachement sécure pour le patient.",
+          connections: ["Sophie Dupont"]
+        }
+      ];
+      
+      // Add each AI-generated relationship
+      aiGeneratedRelations.forEach(relation => {
+        onAddRelationship(relation);
+      });
+      
+      // Save a new version in history
+      const newVersion: RelationVersionHistory = {
+        id: Date.now().toString(),
+        date: new Date(),
+        relationships: [...aiGeneratedRelations],
+        notes: "Relations générées par IA"
+      };
+      setRelationVersions([...relationVersions, newVersion]);
+      
+      setIsGenerating(false);
+      toast.success("Relations générées avec succès");
+    }, 2000);
+  };
+  
+  const handleRestoreVersion = (version: RelationVersionHistory) => {
+    // Replace current relationships with the ones from the selected version
+    // This would require a function to replace all relationships at once in the parent component
+    // For now, we'll just show a toast
+    toast.success(`Version du ${version.date.toLocaleDateString()} restaurée`);
+    setShowVersionHistory(false);
+  };
+  
   return (
     <Card className="w-full overflow-hidden border rounded-xl">
       <CardHeader className="bg-secondary/50 pb-4">
@@ -115,6 +220,86 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
             <CardTitle className="text-lg font-medium">Relations du patient</CardTitle>
           </div>
           <div className="flex space-x-2">
+            <Dialog open={showVersionHistory} onOpenChange={setShowVersionHistory}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Historique des versions</DialogTitle>
+                  <DialogDescription>
+                    Consultez et restaurez des versions précédentes des relations
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="max-h-[400px] overflow-y-auto">
+                  {relationVersions.length > 0 ? (
+                    <div className="space-y-2">
+                      {relationVersions.map((version) => (
+                        <div 
+                          key={version.id} 
+                          className="p-3 rounded-lg border"
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">
+                                {version.date.toLocaleDateString()} à {version.date.toLocaleTimeString()}
+                              </div>
+                              {version.notes && (
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {version.notes}
+                                </div>
+                              )}
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {version.relationships.length} relations
+                              </div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              onClick={() => handleRestoreVersion(version)}
+                            >
+                              <RotateCcw className="h-4 w-4 mr-1" />
+                              Restaurer
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-4">
+                      Aucune version disponible
+                    </p>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => setShowVersionHistory(true)}
+            >
+              <History className="h-4 w-4 mr-2" />
+              Historique
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              onClick={handleGenerateRelations}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                  Génération...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  Générer
+                </>
+              )}
+            </Button>
+            
             <Button
               variant="outline"
               size="sm"
@@ -124,6 +309,7 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
               <FileDown className="h-4 w-4 mr-2" />
               Exporter
             </Button>
+            
             {activeTab === "list" && (
               <Button
                 size="sm"
@@ -253,10 +439,25 @@ const RelationsTab = ({ relationships, onAddRelationship, onUpdateRelationship }
               ) : (
                 <div className="col-span-2 text-center p-12 text-muted-foreground">
                   <p>Aucune relation n'a encore été identifiée.</p>
-                  <Button className="mt-4" onClick={() => setActiveTab("add")}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Ajouter une relation
-                  </Button>
+                  <div className="flex justify-center space-x-4 mt-4">
+                    <Button onClick={() => setActiveTab("add")}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Ajouter manuellement
+                    </Button>
+                    <Button onClick={handleGenerateRelations} disabled={isGenerating}>
+                      {isGenerating ? (
+                        <>
+                          <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                          Génération...
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="mr-2 h-4 w-4" />
+                          Générer avec l'IA
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

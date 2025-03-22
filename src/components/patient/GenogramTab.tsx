@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Users, FileDown, FileText, History, RotateCcw, Pen, Save, Network } from "lucide-react";
+import { Users, FileDown, FileText, History, RotateCcw, Pen, Save, Network, Wand2 } from "lucide-react";
 import { PatientRelationship, GenogramVersion } from "@/types/patient";
 
 // Sample genogram versions
@@ -45,6 +45,7 @@ const GenogramTab = ({ patientId, onSwitchToRelationsTab }: GenogramTabProps) =>
   const [currentVersion, setCurrentVersion] = useState(genogramVersions[genogramVersions.length - 1]);
   const [isEditing, setIsEditing] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   // Simulate exporting and creating a new version
   const handleExportPDF = () => {
@@ -83,6 +84,27 @@ const GenogramTab = ({ patientId, onSwitchToRelationsTab }: GenogramTabProps) =>
   const handleEditGenogram = () => {
     setIsEditing(true);
     onSwitchToRelationsTab();
+  };
+  
+  // Generate a new genogram using AI
+  const handleGenerateGenogram = () => {
+    setIsGenerating(true);
+    
+    // Simulate AI generation
+    setTimeout(() => {
+      const newVersion: GenogramVersion = {
+        id: Date.now().toString(),
+        patientId,
+        createdAt: new Date(),
+        pdfUrl: `/genogram-v${genogramVersions.length + 1}.pdf`,
+        notes: `Génogramme généré automatiquement par IA`
+      };
+      
+      setGenogramVersions([...genogramVersions, newVersion]);
+      setCurrentVersion(newVersion);
+      setIsGenerating(false);
+      toast.success("Génogramme généré avec succès");
+    }, 2000);
   };
   
   return (
@@ -164,6 +186,26 @@ const GenogramTab = ({ patientId, onSwitchToRelationsTab }: GenogramTabProps) =>
             </Button>
             
             <Button
+              variant={currentVersion ? "outline" : "default"}
+              size="sm"
+              className="rounded-xl"
+              onClick={handleGenerateGenogram}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                  Génération...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  {currentVersion ? "Regénérer" : "Générer"}
+                </>
+              )}
+            </Button>
+            
+            <Button
               variant="outline"
               size="sm"
               className="rounded-xl"
@@ -221,11 +263,21 @@ const GenogramTab = ({ patientId, onSwitchToRelationsTab }: GenogramTabProps) =>
                   Aucun génogramme disponible pour ce patient
                 </p>
                 <Button 
-                  onClick={handleEditGenogram}
+                  onClick={handleGenerateGenogram}
                   className="mt-4 rounded-xl"
+                  disabled={isGenerating}
                 >
-                  <Pen className="h-4 w-4 mr-2" />
-                  Créer un génogramme
+                  {isGenerating ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                      Génération...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Générer un génogramme
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
