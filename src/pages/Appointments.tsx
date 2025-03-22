@@ -1,14 +1,9 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import AppointmentForm from "@/components/appointments/AppointmentForm";
+import WeekView from "@/components/appointments/WeekView";
 import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -17,11 +12,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Appointment } from "@/types/patient";
-import { Calendar as CalendarIcon, Plus, Clock, Search, Edit, Check, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import AppointmentForm from "@/components/appointments/AppointmentForm";
-import WeekView from "@/components/appointments/WeekView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Appointment } from "@/types/patient";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { motion } from "framer-motion";
+import {
+  Calendar as CalendarIcon,
+  Check,
+  Clock,
+  Edit,
+  FileText,
+  Plus,
+  Search,
+} from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const sampleAppointments: Appointment[] = [
   {
@@ -32,7 +40,7 @@ const sampleAppointments: Appointment[] = [
     date: new Date(new Date().setHours(new Date().getHours() + 3)),
     duration: 45,
     notes: "Suivi régulier",
-    status: "scheduled"
+    status: "scheduled",
   },
   {
     id: "2",
@@ -42,7 +50,7 @@ const sampleAppointments: Appointment[] = [
     date: new Date(new Date().setDate(new Date().getDate() + 1)),
     duration: 60,
     notes: "Premier rendez-vous",
-    status: "scheduled"
+    status: "scheduled",
   },
   {
     id: "3",
@@ -51,7 +59,7 @@ const sampleAppointments: Appointment[] = [
     patientCode: "934721",
     date: new Date(new Date().setDate(new Date().getDate() + 2)),
     duration: 30,
-    status: "scheduled"
+    status: "scheduled",
   },
   {
     id: "4",
@@ -61,87 +69,94 @@ const sampleAppointments: Appointment[] = [
     date: new Date(new Date().setDate(new Date().getDate() + 7)),
     duration: 45,
     notes: "Suivi bi-mensuel",
-    status: "scheduled"
-  }
+    status: "scheduled",
+  },
 ];
 
 const Appointments = () => {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState<Appointment[]>(sampleAppointments);
+  const [appointments, setAppointments] =
+    useState<Appointment[]>(sampleAppointments);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("list");
-  
-  const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = !searchTerm || 
-      appointment.patientCode.includes(searchTerm);
-    
+
+  const filteredAppointments = appointments.filter((appointment) => {
+    const matchesSearch =
+      !searchTerm || appointment.patientCode.includes(searchTerm);
+
     if (activeTab === "calendar" && selectedDate) {
       const appointmentDate = new Date(appointment.date);
-      return matchesSearch && 
+      return (
+        matchesSearch &&
         appointmentDate.getDate() === selectedDate.getDate() &&
         appointmentDate.getMonth() === selectedDate.getMonth() &&
-        appointmentDate.getFullYear() === selectedDate.getFullYear();
+        appointmentDate.getFullYear() === selectedDate.getFullYear()
+      );
     }
-    
+
     return matchesSearch;
   });
-  
-  const sortedAppointments = [...filteredAppointments].sort((a, b) => a.date.getTime() - b.date.getTime());
-  
+
+  const sortedAppointments = [...filteredAppointments].sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
+
   const formatAppointmentDate = (date: Date) => {
     const isToday = new Date().toDateString() === date.toDateString();
-    
+
     if (isToday) {
-      return `Aujourd'hui à ${format(date, 'HH:mm')}`;
+      return `Aujourd'hui à ${format(date, "HH:mm")}`;
     }
-    
-    const isTomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toDateString() === date.toDateString();
-    
+
+    const isTomorrow =
+      new Date(new Date().setDate(new Date().getDate() + 1)).toDateString() ===
+      date.toDateString();
+
     if (isTomorrow) {
-      return `Demain à ${format(date, 'HH:mm')}`;
+      return `Demain à ${format(date, "HH:mm")}`;
     }
-    
+
     return format(date, "EEEE d MMMM à HH:mm", { locale: fr });
   };
-  
-  const handleAddAppointment = (data: Omit<Appointment, 'id'>) => {
+
+  const handleAddAppointment = (data: Omit<Appointment, "id">) => {
     const newAppointment: Appointment = {
       id: Date.now().toString(),
-      ...data
+      ...data,
     };
-    
+
     setAppointments([...appointments, newAppointment]);
     setIsAddDialogOpen(false);
     toast.success("Rendez-vous ajouté avec succès");
   };
-  
+
   const handleViewPatient = (patientId: string) => {
     navigate(`/patient/${patientId}`);
   };
-  
+
   const handleCloseAppointment = (appointmentId: string) => {
-    setAppointments(prev => 
-      prev.map(app => 
-        app.id === appointmentId 
-          ? { ...app, status: "completed" } 
-          : app
+    setAppointments((prev) =>
+      prev.map((app) =>
+        app.id === appointmentId ? { ...app, status: "completed" } : app
       )
     );
     toast.success("Rendez-vous clôturé avec succès");
   };
-  
-  const appointmentDates = appointments.map(app => {
+
+  const appointmentDates = appointments.map((app) => {
     const date = new Date(app.date);
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   });
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
-      <motion.main 
+
+      <motion.main
         className="flex-1 container mx-auto px-6 py-8 max-w-6xl"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -150,9 +165,11 @@ const Appointments = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Gestion des Rendez-vous</h1>
-            <p className="text-muted-foreground">Planifiez et gérez vos rendez-vous</p>
+            <p className="text-muted-foreground">
+              Planifiez et gérez vos rendez-vous
+            </p>
           </div>
-          
+
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2">
@@ -167,35 +184,39 @@ const Appointments = () => {
                   Planifiez un nouveau rendez-vous avec un patient
                 </DialogDescription>
               </DialogHeader>
-              <AppointmentForm 
-                onSubmit={handleAddAppointment} 
+              <AppointmentForm
+                onSubmit={handleAddAppointment}
                 onCancel={() => setIsAddDialogOpen(false)}
               />
             </DialogContent>
           </Dialog>
         </div>
-        
-        <Tabs defaultValue="list" value={activeTab} onValueChange={setActiveTab}>
+
+        <Tabs
+          defaultValue="list"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <div className="flex justify-between items-center mb-6">
             <TabsList>
-              <TabsTrigger value="list">Liste</TabsTrigger>
+              <TabsTrigger value="list">Listes</TabsTrigger>
               <TabsTrigger value="calendar">Calendrier</TabsTrigger>
               <TabsTrigger value="week">Semaine</TabsTrigger>
             </TabsList>
-            
+
             <div className="flex items-center space-x-4">
               <div className="relative w-64">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Rechercher par code..."
                   value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
                 />
               </div>
             </div>
           </div>
-          
+
           <TabsContent value="list" className="mt-0">
             <Card>
               <CardHeader className="pb-3">
@@ -205,11 +226,16 @@ const Appointments = () => {
                 {sortedAppointments.length > 0 ? (
                   <div className="space-y-1 divide-y">
                     {sortedAppointments.map((appointment) => (
-                      <div key={appointment.id} className="pt-4 first:pt-0 pb-4">
+                      <div
+                        key={appointment.id}
+                        className="pt-4 first:pt-0 pb-4"
+                      >
                         <div className="flex items-start justify-between">
                           <div>
                             <div className="flex items-center space-x-2">
-                              <div className="font-medium">Patient #{appointment.patientCode}</div>
+                              <div className="font-medium">
+                                Patient #{appointment.patientCode}
+                              </div>
                             </div>
                             <div className="flex items-center mt-1 text-sm text-muted-foreground">
                               <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
@@ -219,29 +245,37 @@ const Appointments = () => {
                               <span>{appointment.duration} min</span>
                             </div>
                             {appointment.notes && (
-                              <div className="mt-2 text-sm">{appointment.notes}</div>
+                              <div className="mt-2 text-sm">
+                                {appointment.notes}
+                              </div>
                             )}
                           </div>
                           <div className="flex space-x-2">
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="outline"
-                              onClick={() => navigate(`/appointments/edit/${appointment.id}`)}
+                              onClick={() =>
+                                navigate(`/appointments/edit/${appointment.id}`)
+                              }
                             >
                               <Edit className="h-4 w-4 mr-1.5" />
                               Modifier
                             </Button>
-                            <Button 
+                            <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleCloseAppointment(appointment.id)}
+                              onClick={() =>
+                                handleCloseAppointment(appointment.id)
+                              }
                             >
                               <Check className="h-4 w-4 mr-1.5" />
                               Clôturer
                             </Button>
-                            <Button 
+                            <Button
                               size="sm"
-                              onClick={() => handleViewPatient(appointment.patientId)}
+                              onClick={() =>
+                                handleViewPatient(appointment.patientId)
+                              }
                             >
                               <FileText className="h-4 w-4 mr-1.5" />
                               Voir le dossier
@@ -256,12 +290,15 @@ const Appointments = () => {
                     {searchTerm ? (
                       <p>Aucun rendez-vous ne correspond à votre recherche</p>
                     ) : activeTab === "calendar" && selectedDate ? (
-                      <p>Aucun rendez-vous pour le {format(selectedDate, 'PPP', { locale: fr })}</p>
+                      <p>
+                        Aucun rendez-vous pour le{" "}
+                        {format(selectedDate, "PPP", { locale: fr })}
+                      </p>
                     ) : (
                       <p>Aucun rendez-vous à venir</p>
                     )}
-                    <Button 
-                      className="mt-4" 
+                    <Button
+                      className="mt-4"
                       variant="outline"
                       onClick={() => setIsAddDialogOpen(true)}
                     >
@@ -273,7 +310,7 @@ const Appointments = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="calendar" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="md:col-span-1">
@@ -283,24 +320,25 @@ const Appointments = () => {
                     selected={selectedDate}
                     onSelect={setSelectedDate}
                     modifiers={{
-                      booked: appointmentDates
+                      booked: appointmentDates,
                     }}
                     modifiersClassNames={{
-                      booked: "border-2 border-primary text-primary-foreground font-bold"
+                      booked:
+                        "border-2 border-primary text-primary-foreground font-bold",
                     }}
                     className="pointer-events-auto"
                   />
                 </CardContent>
               </Card>
-              
+
               <Card className="md:col-span-2">
                 <CardHeader className="pb-3">
                   <CardTitle>
-                    {selectedDate ? (
-                      `Rendez-vous du ${format(selectedDate, 'PPP', { locale: fr })}`
-                    ) : (
-                      "Sélectionnez une date"
-                    )}
+                    {selectedDate
+                      ? `Rendez-vous du ${format(selectedDate, "PPP", {
+                          locale: fr,
+                        })}`
+                      : "Sélectionnez une date"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -311,38 +349,50 @@ const Appointments = () => {
                           <div className="flex items-start justify-between">
                             <div>
                               <div className="flex items-center space-x-2">
-                                <div className="font-medium">Patient #{appointment.patientCode}</div>
+                                <div className="font-medium">
+                                  Patient #{appointment.patientCode}
+                                </div>
                               </div>
                               <div className="flex items-center mt-1 text-sm text-muted-foreground">
                                 <Clock className="h-3.5 w-3.5 mr-1.5" />
-                                <span>{format(appointment.date, 'HH:mm')}</span>
+                                <span>{format(appointment.date, "HH:mm")}</span>
                                 <span className="mx-1.5">•</span>
                                 <span>{appointment.duration} min</span>
                               </div>
                               {appointment.notes && (
-                                <div className="mt-2 text-sm">{appointment.notes}</div>
+                                <div className="mt-2 text-sm">
+                                  {appointment.notes}
+                                </div>
                               )}
                             </div>
                             <div className="flex space-x-2">
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="outline"
-                                onClick={() => navigate(`/appointments/edit/${appointment.id}`)}
+                                onClick={() =>
+                                  navigate(
+                                    `/appointments/edit/${appointment.id}`
+                                  )
+                                }
                               >
                                 <Edit className="h-4 w-4 mr-1.5" />
                                 Modifier
                               </Button>
-                              <Button 
+                              <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleCloseAppointment(appointment.id)}
+                                onClick={() =>
+                                  handleCloseAppointment(appointment.id)
+                                }
                               >
                                 <Check className="h-4 w-4 mr-1.5" />
                                 Clôturer
                               </Button>
-                              <Button 
+                              <Button
                                 size="sm"
-                                onClick={() => handleViewPatient(appointment.patientId)}
+                                onClick={() =>
+                                  handleViewPatient(appointment.patientId)
+                                }
                               >
                                 <FileText className="h-4 w-4 mr-1.5" />
                                 Voir le dossier
@@ -355,8 +405,8 @@ const Appointments = () => {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <p>Aucun rendez-vous pour cette date</p>
-                      <Button 
-                        className="mt-4" 
+                      <Button
+                        className="mt-4"
                         variant="outline"
                         onClick={() => setIsAddDialogOpen(true)}
                       >
@@ -369,11 +419,11 @@ const Appointments = () => {
               </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="week" className="mt-0">
-            <WeekView 
-              appointments={appointments} 
-              onCloseAppointment={handleCloseAppointment} 
+            <WeekView
+              appointments={appointments}
+              onCloseAppointment={handleCloseAppointment}
             />
           </TabsContent>
         </Tabs>
